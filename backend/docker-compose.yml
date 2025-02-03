@@ -1,0 +1,51 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: glow_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./src:/var/www
+    depends_on:
+      - db
+    networks:
+      - glow_network
+
+  webserver:
+    image: nginx:latest
+    container_name: glow_webserver
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./src:/var/www
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - glow_network
+
+  db:
+    image: mariadb:10.5
+    container_name: glow_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: glow_db
+      MYSQL_USER: glow
+      MYSQL_PASSWORD: (9|D2Ig0kXi{.]cK210I
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - glow_network
+
+volumes:
+  dbdata:
+
+networks:
+  glow_network:
+    driver: bridge
