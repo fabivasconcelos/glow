@@ -9,7 +9,7 @@ const AnamnesisForm = () => {
     const [answers, setAnswers] = useState({});
 
     useEffect(() => {
-        axios.get("http://localhost:8000/api/anamnesis")
+        axios.get("http://localhost:8000/api/anamnesis/questions")
             .then(response => setQuestions(response.data))
             .catch(error => console.error("Erro ao buscar perguntas:", error));
     }, []);
@@ -23,23 +23,17 @@ const AnamnesisForm = () => {
             if (question.type === "multiple_choice") {
                 formattedOptionIds = Array.isArray(answer) ? answer : [];
             } else if (question.type === "single_choice") {
-                formattedOptionIds = answer
+                formattedOptionIds = Array.isArray(answer) ? answer : [answer];
             }
 
-            const response = await fetch("http://localhost:8000/api/anamnesis/answers", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    user_id: 1, // Substituir pelo ID real do usuário
-                    question_id: questionId,
-                    option_ids: formattedOptionIds,
-                    text_answer: typeof answer === "string" ? answer : null,
-                }),
+            await axios.post("http://localhost:8000/api/anamnesis/answers", {
+                user_id: 1, // Substituir pelo ID real do usuário
+                question_id: questionId,
+                option_ids: formattedOptionIds,
+                text_answer: typeof answer === "string" ? answer : null,
+            }, {
+                headers: { "Content-Type": "application/json" }
             });
-
-            if (!response.ok) {
-                console.error("Erro ao salvar resposta.");
-            }
         } catch (error) {
             console.error("Erro ao enviar resposta:", error);
         }

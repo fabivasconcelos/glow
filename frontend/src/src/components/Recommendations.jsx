@@ -6,6 +6,10 @@ const Recommendations = () => {
     const navigate = useNavigate();
     const therapists = location.state?.therapists || [];
 
+    const handleSelectTherapist = (therapistId) => {
+        navigate(`/therapist/${therapistId}`);
+    };
+
     return (
         <div className="min-h-screen bg-[#3D2B1F] text-white px-6 py-10 font-sans flex flex-col items-center">
             {/* Header */}
@@ -17,7 +21,7 @@ const Recommendations = () => {
             {/* Therapist Cards */}
             <div className="w-full max-w-lg space-y-4 mt-6">
                 {therapists.map((therapist, index) => (
-                    <div key={therapist.id} className={`relative flex items-center p-4 rounded-xl shadow-lg ${index === therapists.length - 1 ? 'bg-[#DB8F00] text-white' : 'bg-white text-black'}`}>
+                    <div key={therapist.id} onClick={() => handleSelectTherapist(therapist.id)} className={`relative flex items-center p-4 rounded-xl shadow-lg ${index === therapists.length - 1 ? 'bg-[#DB8F00] text-white' : 'bg-white text-black'} cursor-pointer`}>
                         {/* Therapist Info */}
                         <div className="flex-1">
                             <h2 className="font-gloock text-xl font-normal leading-tight">{therapist.name}</h2>

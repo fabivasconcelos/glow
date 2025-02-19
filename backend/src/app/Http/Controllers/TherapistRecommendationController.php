@@ -23,16 +23,16 @@ class TherapistRecommendationController extends Controller
         foreach ($answers as $answer) {
             $optionIds = json_decode($answer->option_ids, true);
 
-            if ($answer->question_id == 7) { // Pergunta sobre gênero
-                $userPreferences['gender'] = AnamnesisOption::whereIn('id', (array) $optionIds)->pluck('option')->first();
-            }
-
             if ($answer->question_id == 3) { // Estilo de interação preferido
                 $userPreferences['interaction_style'] = AnamnesisOption::whereIn('id', (array) $optionIds)->pluck('option')->first();
             }
 
             if ($answer->question_id == 6) { // Especialidades desejadas
                 $userPreferences['specialties'] = AnamnesisOption::whereIn('id', (array) $optionIds)->pluck('option')->toArray();
+            }
+
+            if ($answer->question_id == 7) { // Pergunta sobre gênero
+                $userPreferences['gender'] = AnamnesisOption::whereIn('id', (array) $optionIds)->pluck('option')->first();
             }
 
             if ($answer->question_id == 8) { // Faixa etária do usuário
@@ -43,6 +43,8 @@ class TherapistRecommendationController extends Controller
         // Pegamos os terapeutas e calculamos a pontuação de match
         $therapists = Therapist::all()->map(function ($therapist) use ($userPreferences) {
             $matchScore = 0;
+
+            Log::info("User pref", ['T' => $userPreferences]);
 
             // Comparação de gênero
             if (!empty($userPreferences['gender']) && $userPreferences['gender'] !== "No preference") {
@@ -68,7 +70,7 @@ class TherapistRecommendationController extends Controller
                 'name' => $therapist->name,
                 'specialization' => $therapist->specialization,
                 'bio' => $therapist->bio,
-                'profile_picture' => asset($therapist->profile_picture),
+                'profile_picture' => $therapist->profile_picture,
                 'gender' => $therapist->gender,
                 'interaction_style' => $therapist->interaction_style,
                 'specialties' => $therapist->specialties,
@@ -77,6 +79,8 @@ class TherapistRecommendationController extends Controller
                 'match_score' => $matchScore,
             ];
         });
+
+        Log::info("Result", ['T' => $therapists]);
 
         // Ordenamos os terapeutas pelo maior match e pegamos os 4 melhores
         $sortedTherapists = $therapists->sortByDesc('match_score')->take(4)->values();

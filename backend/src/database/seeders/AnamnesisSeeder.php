@@ -28,8 +28,8 @@ class AnamnesisSeeder extends Seeder
                 'question' => 'What kind of therapist interaction style would you prefer?',
                 'type' => 'single_choice',
                 'options' => [
-                    'Structured (goal-oriented and directive)',
-                    'Conversational (open-ended and supportive)',
+                    'Structured',
+                    'Conversational',
                     'No preference'
                 ],
             ],
@@ -47,7 +47,7 @@ class AnamnesisSeeder extends Seeder
                 'question' => 'Do you have any preferences regarding the therapist\'s background or specialization?',
                 'type' => 'multiple_choice',
                 'options' => [
-                    'Trauma', 'Anxiety disorders', 'Depression', 'Relationship and Family Therapy',
+                    'Trauma', 'Anxiety', 'Depression', 'Relationship and Family Therapy',
                     'Career Coaching', 'Holistic or Alternative Therapy', 'No specific preference'
                 ],
             ],

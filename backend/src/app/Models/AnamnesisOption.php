@@ -9,7 +9,7 @@ class AnamnesisOption extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['question_id', 'option_text'];
+    protected $fillable = ['question_id', 'option'];
 
     public function question()
     {
