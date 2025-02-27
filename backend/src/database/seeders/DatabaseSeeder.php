@@ -11,7 +11,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AnamnesisSeeder::class,
             UserSeeder::class,
-            TherapistSeeder::class
+            TherapistSeeder::class,
+            AdminSeeder::class
         ]);
     }
 }

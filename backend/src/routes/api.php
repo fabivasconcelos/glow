@@ -5,6 +5,16 @@ use App\Http\Controllers\AnamnesisController;
 use App\Http\Controllers\TherapistRecommendationController;
 use App\Http\Controllers\TherapistController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\UserController;
+
+Route::post('/register', [UserController::class, 'register']);
+Route::post('/login', [UserController::class, 'login']);
+
+// Rotas protegidas por autenticação
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/profile', [UserController::class, 'profile']);
+    Route::post('/profile', [UserController::class, 'update']);
+});
 
 Route::post('/anamnesis/answers', [AnamnesisController::class, 'answer']);
 Route::get('/anamnesis/questions', [AnamnesisController::class, 'index']);
