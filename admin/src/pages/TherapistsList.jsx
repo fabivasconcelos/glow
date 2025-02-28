@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
@@ -6,14 +6,14 @@ const TherapistsList = () => {
     const [therapists, setTherapists] = useState([]);
 
     useEffect(() => {
-        axios.get("http://localhost:8000/api/therapists")
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/therapists`)
             .then((response) => setTherapists(response.data))
             .catch((error) => console.error("Erro ao buscar terapeutas:", error));
     }, []);
 
     const deleteTherapist = (id) => {
         if (window.confirm("Tem certeza que deseja excluir este terapeuta?")) {
-            axios.delete(`http://localhost:8000/api/therapists/${id}`)
+            axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/therapists/${id}`)
                 .then(() => setTherapists(therapists.filter((t) => t.id !== id)))
                 .catch((error) => console.error("Erro ao excluir terapeuta:", error));
         }

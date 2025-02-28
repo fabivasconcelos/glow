@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
+
 
 const TherapistForm = ({ onSuccess }) => {
     const { id } = useParams();
@@ -24,7 +23,7 @@ const TherapistForm = ({ onSuccess }) => {
 
     useEffect(() => {
         if (id) {
-            axios.get(`http://localhost:8000/api/therapists/${id}`)
+            axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/therapists/${id}`)
                 .then(response => {
                     const therapistData = response.data;
                     setFormData({
@@ -76,11 +75,11 @@ const TherapistForm = ({ onSuccess }) => {
 
         try {
             if (id) {
-                await axios.post(`http://localhost:8000/api/therapists/${id}`, form, {
+                await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/therapists/${id}`, form, {
                     headers: { "Content-Type": "multipart/form-data" }
                 });
             } else {
-                await axios.post("http://localhost:8000/api/therapists", form, {
+                await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/therapists`, form, {
                     headers: { "Content-Type": "multipart/form-data" }
                 });
             }

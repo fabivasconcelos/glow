@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
@@ -11,7 +11,7 @@ const AnamnesisQuestionsList = () => {
 
   const fetchQuestions = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/anamnesis/questions");
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/anamnesis/questions`);
       setQuestions(response.data);
     } catch (error) {
       console.error("Erro ao buscar perguntas:", error);
@@ -21,7 +21,7 @@ const AnamnesisQuestionsList = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Tem certeza que deseja excluir esta pergunta?")) {
       try {
-        await axios.delete(`http://localhost:8000/api/anamnesis/questions/${id}`);
+        await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/anamnesis/questions/${id}`);
         fetchQuestions();
       } catch (error) {
         console.error("Erro ao excluir pergunta:", error);

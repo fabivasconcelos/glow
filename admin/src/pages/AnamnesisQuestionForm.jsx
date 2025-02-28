@@ -1,5 +1,5 @@
 // Ajustes no AnamnesisQuestionForm.jsx
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -17,7 +17,7 @@ const AnamnesisQuestionForm = () => {
 
     useEffect(() => {
         if (isEditing) {
-            axios.get(`http://localhost:8000/api/anamnesis/questions/${id}`)
+            axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/anamnesis/questions/${id}`)
                 .then(response => {
                     const { question, type, options } = response.data;
                     setFormData({
@@ -60,9 +60,9 @@ const AnamnesisQuestionForm = () => {
         try {
             const payload = { ...formData, options: formData.options.filter(opt => opt.trim() !== "") };
             if (isEditing) {
-                await axios.post(`http://localhost:8000/api/anamnesis/questions/${id}`, payload);
+                await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/anamnesis/questions/${id}`, payload);
             } else {
-                await axios.post("http://localhost:8000/api/anamnesis/questions", payload);
+                await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/anamnesis/questions`, payload);
             }
             navigate("/anamnesis/questions");
         } catch (error) {

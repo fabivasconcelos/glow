@@ -32,7 +32,7 @@ class User extends Authenticatable
      */
     public function getProfilePictureAttribute($value)
     {
-        return $value ? asset($value) : null;
+        return $value ? env('APP_URL') . $value : null;
     }
 
     // Acessor útil para exibir o nome completo diretamente

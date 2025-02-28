@@ -18,6 +18,6 @@ class Therapist extends Model
     // Criando um accessor para a URL correta da imagem do perfil
     public function getProfilePictureAttribute($value)
     {
-        return $value ? asset($value) : null;
+        return $value ?  env('APP_URL') . $value : null;
     }
 }
