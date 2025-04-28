@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\TherapistRequest;
 use App\Models\Therapist;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
@@ -12,138 +12,198 @@ class TherapistController extends Controller
 {
     public function index()
     {
-        return response()->json(Therapist::all(), 200);
+        return response()->json(Therapist::with(['anamnesisCategories', 'specializations', 'specializedDemographics', 'languages'])->get(), 200);
     }
-    /**
-     * Retorna os detalhes do terapeuta pelo ID.
-     */
+
     public function show($id)
     {
-        $therapist = Therapist::findOrFail($id);
+        $therapist = Therapist::with(['anamnesisCategories', 'specializations', 'specializedDemographics', 'languages'])->findOrFail($id);
 
-        return response()->json([
-            'id' => $therapist->id,
-            'name' => $therapist->name,
-            'specialization' => $therapist->specialization,
-            'bio' => $therapist->bio,
-            'profile_picture' => $therapist->profile_picture,
-            'gender' => $therapist->gender,
-            'interaction_style' => $therapist->interaction_style,
-            'specialties' => is_string($therapist->specialties) ? json_decode($therapist->specialties, true) : $therapist->specialties,
-            'age_experience' => $therapist->age_experience,
-            'session_price' => $therapist->session_price,
-            'video_url' => $therapist->video_url,
-            'meeting_link' => $therapist->meeting_link
-        ]);
+        return response()->json($therapist);
     }
 
-    // Criar um terapeuta
-    public function store(Request $request)
+    public function store(TherapistRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'specialization' => 'required|string|max:255',
-            'bio' => 'nullable|string',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'gender' => 'required|string',
-            'interaction_style' => 'required|string',
-            'specialties' => 'required|array',
-            'age_experience' => 'required|string',
-            'session_price' => 'required|numeric',
-            'video_url' => 'nullable|url',
-            'meeting_link' => 'nullable|url',
-        ]);
+        $data = $request->validated();
 
-        // Salvar a imagem dentro de public/images/therapists
-        $profilePicturePath = null;
         if ($request->hasFile('profile_picture')) {
             $file = $request->file('profile_picture');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('images/therapists'), $filename);
-            $profilePicturePath = 'images/therapists/' . $filename;
+            $data['profile_picture'] = 'images/therapists/' . $filename;
         }
 
-        $therapist = Therapist::create([
-            'name' => $request->name,
-            'specialization' => $request->specialization,
-            'bio' => $request->bio,
-            'profile_picture' => $profilePicturePath, // Salva o caminho relativo no banco
-            'gender' => $request->gender,
-            'interaction_style' => $request->interaction_style,
-            'specialties' => $request->specialties,
-            'age_experience' => $request->age_experience,
-            'session_price' => $request->session_price,
-            'video_url' => $request->video_url,
-            'meeting_link' => $request->meeting_link,
-        ]);
+        if ($request->hasFile('intro_video')) {
+            $file = $request->file('intro_video');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('videos/therapists'), $filename);
+            $data['intro_video'] = 'videos/therapists/' . $filename;
+        }
 
-        return response()->json($therapist, 201);
+        $therapist = Therapist::create($data);
+        
+        // 🔥 Specializations
+        $specializationData = [];
+        if (isset($data['specialization_ids'])) {
+            foreach ($data['specialization_ids'] as $id) {
+                $specializationData[$id] = ['other_text' => null];
+            }
+        }
+        if (!empty($data['specialization_other']) && !empty($specializationData)) {
+            // Atualiza o ID que é o "Other" com o texto customizado
+            $otherId = array_key_last($specializationData); // ou você pode localizar pelo valor na API se quiser
+            $specializationData[$otherId]['other_text'] = $data['specialization_other'];
+        }
+        $therapist->specializations()->sync($specializationData);
+
+        // 🔥 Specialized Demographics
+        $specializationData = [];
+        if (isset($data['specialization_ids'])) {
+            foreach ($data['specialization_ids'] as $id) {
+                $specializationData[$id] = ['other_text' => null];
+            }
+        }
+        if (!empty($data['specialization_other']) && !empty($specializationData)) {
+            // Atualiza o ID que é o "Other" com o texto customizado
+            $otherId = array_key_last($specializationData); // ou você pode localizar pelo valor na API se quiser
+            $specializationData[$otherId]['other_text'] = $data['specialization_other'];
+        }
+        $therapist->specializations()->sync($specializationData);
+
+        // 🔥 Specialized Demographics
+        $demographicData = [];
+        if (isset($data['specialized_demographic_ids'])) {
+            foreach ($data['specialized_demographic_ids'] as $id) {
+                $demographicData[$id] = ['other_text' => null];
+            }
+        }
+        if (!empty($data['specialized_demographic_other']) && !empty($demographicData)) {
+            $otherId = array_key_last($demographicData);
+            $demographicData[$otherId]['other_text'] = $data['specialized_demographic_other'];
+        }
+        $therapist->specializedDemographics()->sync($demographicData);
+
+        // 🔥 Languages
+        $languageData = [];
+        if (isset($data['language_ids'])) {
+            foreach ($data['language_ids'] as $id) {
+                $languageData[$id] = ['other_text' => null];
+            }
+        }
+        if (!empty($data['language_other']) && !empty($languageData)) {
+            $otherId = array_key_last($languageData);
+            $languageData[$otherId]['other_text'] = $data['language_other'];
+        }
+        $therapist->languages()->sync($languageData);
+
+        // 🔥 Anamnesis Categories (normal, sem other)
+        if (isset($data['anamnesis_category_ids'])) {
+            $therapist->anamnesisCategories()->sync($data['anamnesis_category_ids']);
+        }
+
+        return response()->json($therapist->load(['anamnesisCategories', 'specializations', 'specializedDemographics', 'languages']), 201);
     }
 
-    // Atualizar terapeuta
-    public function update(Request $request, $id)
+    public function update(TherapistRequest $request, $id)
     {
-        // Registrar os dados recebidos para depuração
-        Log::info('🔍 Recebendo dados para atualização:', ['data' => $request->all()]);
-
         $therapist = Therapist::findOrFail($id);
+        $data = $request->validated();
 
-        // Ajuste na validação: profile_picture agora só será exigida se for um arquivo
-        $rules = [
-            'name' => 'sometimes|string|max:255',
-            'specialization' => 'sometimes|string|max:255',
-            'bio' => 'nullable|string',
-            'gender' => 'sometimes|string',
-            'interaction_style' => 'sometimes|string',
-            'specialties' => 'sometimes|array',
-            'age_experience' => 'sometimes|string',
-            'session_price' => 'sometimes|numeric',
-            'video_url' => 'nullable|url',
-            'meeting_link' => 'nullable|url',
-        ];
-
-        // Se um novo arquivo for enviado, validar como imagem
-        if ($request->hasFile('profile_picture')) {
-            $rules['profile_picture'] = 'image|mimes:jpeg,png,jpg,gif|max:2048';
-        }
-
-        $validatedData = $request->validate($rules);
-
-        // Verificar se specialties veio como string e converter para array
-        if (isset($validatedData['specialties']) && is_string($validatedData['specialties'])) {
-            $validatedData['specialties'] = json_decode($validatedData['specialties'], true);
-        }
-
-        // Verificar se specialties ainda não é um array válido
-        if (!is_array($validatedData['specialties'])) {
-            $validatedData['specialties'] = [];
-        }
-
-        // Se um novo arquivo foi enviado, substituir a imagem antiga
         if ($request->hasFile('profile_picture')) {
             if ($therapist->profile_picture && File::exists(public_path($therapist->profile_picture))) {
                 File::delete(public_path($therapist->profile_picture));
             }
-
             $file = $request->file('profile_picture');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('images/therapists'), $filename);
-            $validatedData['profile_picture'] = 'images/therapists/' . $filename;
+            $data['profile_picture'] = 'images/therapists/' . $filename;
         }
 
-        // Atualizar terapeuta
-        $therapist->update($validatedData);
+        if ($request->hasFile('intro_video')) {
+            if ($therapist->intro_video && File::exists(public_path($therapist->intro_video))) {
+                File::delete(public_path($therapist->intro_video));
+            }
+            $file = $request->file('intro_video');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('videos/therapists'), $filename);
+            $data['intro_video'] = 'videos/therapists/' . $filename;
+        }
+
+        $therapist->update($data);
+
+        // 🔥 Specializations
+        $specializationData = [];
+        if (isset($data['specialization_ids'])) {
+            foreach ($data['specialization_ids'] as $id) {
+                $specializationData[$id] = ['other_text' => null];
+            }
+        }
+        if (!empty($data['specialization_other']) && !empty($specializationData)) {
+            // Atualiza o ID que é o "Other" com o texto customizado
+            $otherId = array_key_last($specializationData); // ou você pode localizar pelo valor na API se quiser
+            $specializationData[$otherId]['other_text'] = $data['specialization_other'];
+        }
+        $therapist->specializations()->sync($specializationData);
+
+        // 🔥 Specialized Demographics
+        $specializationData = [];
+        if (isset($data['specialization_ids'])) {
+            foreach ($data['specialization_ids'] as $id) {
+                $specializationData[$id] = ['other_text' => null];
+            }
+        }
+        if (!empty($data['specialization_other']) && !empty($specializationData)) {
+            // Atualiza o ID que é o "Other" com o texto customizado
+            $otherId = array_key_last($specializationData); // ou você pode localizar pelo valor na API se quiser
+            $specializationData[$otherId]['other_text'] = $data['specialization_other'];
+        }
+        $therapist->specializations()->sync($specializationData);
+
+        // 🔥 Specialized Demographics
+        $demographicData = [];
+        if (isset($data['specialized_demographic_ids'])) {
+            foreach ($data['specialized_demographic_ids'] as $id) {
+                $demographicData[$id] = ['other_text' => null];
+            }
+        }
+        if (!empty($data['specialized_demographic_other']) && !empty($demographicData)) {
+            $otherId = array_key_last($demographicData);
+            $demographicData[$otherId]['other_text'] = $data['specialized_demographic_other'];
+        }
+        $therapist->specializedDemographics()->sync($demographicData);
+
+        // 🔥 Languages
+        $languageData = [];
+        if (isset($data['language_ids'])) {
+            foreach ($data['language_ids'] as $id) {
+                $languageData[$id] = ['other_text' => null];
+            }
+        }
+        if (!empty($data['language_other']) && !empty($languageData)) {
+            $otherId = array_key_last($languageData);
+            $languageData[$otherId]['other_text'] = $data['language_other'];
+        }
+        $therapist->languages()->sync($languageData);
+
+        if (isset($data['anamnesis_category_ids'])) {
+            $therapist->anamnesisCategories()->sync($data['anamnesis_category_ids']);
+        }
 
         return response()->json(['message' => 'Therapist updated successfully']);
     }
 
-    // Deletar terapeuta
     public function destroy($id)
     {
         $therapist = Therapist::findOrFail($id);
-        if ($therapist->profile_picture) {
-            Storage::disk('public')->delete($therapist->profile_picture);
+
+        if ($therapist->profile_picture && File::exists(public_path($therapist->profile_picture))) {
+            File::delete(public_path($therapist->profile_picture));
         }
+
+        if ($therapist->intro_video && File::exists(public_path($therapist->intro_video))) {
+            File::delete(public_path($therapist->intro_video));
+        }
+
         $therapist->delete();
 
         return response()->json(['message' => 'Therapist deleted successfully']);

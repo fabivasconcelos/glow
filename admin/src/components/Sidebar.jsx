@@ -12,6 +12,12 @@ const Sidebar = () => {
           <li className="mb-2">
             <Link to="/therapists" className="block p-2 rounded hover:bg-gray-700">Therapists</Link>
           </li>
+          <li className="mb-2">
+            <Link to="/anamnesis/categories" className="block p-2 rounded hover:bg-gray-700"> Anamnesis Categories</Link>
+          </li>
+          <li className="mb-2">
+            <Link to="/anamnesis/sections" className="block p-2 rounded hover:bg-gray-700"> Anamnesis Sections</Link>
+          </li>
           <li>
             <Link to="/anamnesis/questions" className="block p-2 hover:bg-gray-200">
               Anamnesis Questions

@@ -8,6 +8,10 @@ import TherapistForm from "./pages/TherapistForm";
 import AnamnesisQuestionsList from "./pages/AnamnesisQuestionsList";
 import AnamnesisQuestionForm from "./pages/AnamnesisQuestionForm";
 import Login from "./pages/Login";
+import AnamnesisCategoriesList from "./pages/AnamnesisCategoriesList";
+import AnamnesisCategoriesForm from "./pages/AnamnesisCategoriesForm";
+import AnamnesisSectionsList from "./pages/AnamnesisSectionsList";
+import AnamnesisSectionsForm from "./pages/AnamnesisSectionsForm";
 
 function App() {
   return (
@@ -25,6 +29,12 @@ function App() {
           <Route path="/anamnesis/questions" element={<Layout><AnamnesisQuestionsList /></Layout>} />
           <Route path="/anamnesis/questions/new" element={<Layout><AnamnesisQuestionForm /></Layout>} />
           <Route path="/anamnesis/questions/edit/:id" element={<Layout><AnamnesisQuestionForm /></Layout>} />
+          <Route path="/anamnesis/categories" element={<Layout><AnamnesisCategoriesList /></Layout>} />
+          <Route path="/anamnesis/categories/new" element={<Layout><AnamnesisCategoriesForm /></Layout>} />
+          <Route path="/anamnesis/categories/edit/:id" element={<Layout><AnamnesisCategoriesForm /></Layout>} />
+          <Route path="/anamnesis/sections" element={<Layout><AnamnesisSectionsList /></Layout>} />
+          <Route path="/anamnesis/sections/new" element={<Layout><AnamnesisSectionsForm /></Layout>} />
+          <Route path="/anamnesis/sections/edit/:id" element={<Layout><AnamnesisSectionsForm /></Layout>} />
         </Route>
       </Routes>
     </Router>

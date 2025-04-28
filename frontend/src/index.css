@@ -1,4 +1,7 @@
 @import "@fontsource/inter";
+@import "@fontsource/inter/400.css"; /* Regular */
+@import "@fontsource/inter/500.css"; /* Medium */
+@import "@fontsource/inter/700.css"; /* Bold */
 @import "@fontsource/gloock";
 
 @tailwind base;

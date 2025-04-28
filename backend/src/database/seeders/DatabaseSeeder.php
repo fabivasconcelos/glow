@@ -9,10 +9,15 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            AnamnesisSeeder::class,
             UserSeeder::class,
-            TherapistSeeder::class,
-            AdminSeeder::class
+            AdminSeeder::class,
+            AnamnesisCategoriesSeeder::class,
+            AnamnesisSectionSeeder::class,
+            AnamnesisSeeder::class,
+            SpecializationsSeeder::class,
+            SpecializedDemographicsSeeder::class,
+            LanguagesSeeder::class,
+            TherapistSeeder::class
         ]);
     }
 }

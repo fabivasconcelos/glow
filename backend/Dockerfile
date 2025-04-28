@@ -31,4 +31,8 @@ COPY src ./
 # Definir permissões corretas
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
+RUN echo "upload_max_filesize=10M" >> /usr/local/etc/php/conf.d/uploads.ini \
+ && echo "post_max_size=12M" >> /usr/local/etc/php/conf.d/uploads.ini \
+ && echo "memory_limit=128M" >> /usr/local/etc/php/conf.d/uploads.ini
+
 CMD ["php-fpm"]

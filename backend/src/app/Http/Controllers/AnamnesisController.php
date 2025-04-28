@@ -11,9 +11,21 @@ use Illuminate\Support\Facades\Log;
 class AnamnesisController extends Controller
 {
     // ✅ Listar todas as perguntas com opções
-    public function index()
+    public function index(Request $request)
     {
-        $questions = AnamnesisQuestion::with('options')->get();
+        $query = AnamnesisQuestion::with(['options', 'section']);
+
+        // Se for passado um ID de categoria, filtra pelas seções da categoria
+        if ($request->has('anamnesis_category_id')) {
+            $categoryId = $request->get('anamnesis_category_id');
+
+            $query->whereHas('section', function ($q) use ($categoryId) {
+                $q->where('anamnesis_category_id', $categoryId);
+            });
+        }
+
+        $questions = $query->orderBy('order')->get();
+
         return response()->json($questions);
     }
 
@@ -63,13 +75,15 @@ class AnamnesisController extends Controller
             'question' => 'required|string|max:255',
             'type' => 'required|in:single_choice,multiple_choice,text',
             'options' => 'nullable|array',
-            'options.*' => 'required|string|max:255'
+            'options.*' => 'required|string|max:255',
+            'anamnesis_section_id' => 'required|exists:anamnesis_sections,id',
         ]);
 
         // Criar a pergunta
         $question = AnamnesisQuestion::create([
             'question' => $request->question,
             'type' => $request->type,
+            'anamnesis_section_id' => $request->anamnesis_section_id,
         ]);
 
         // Criar opções se for uma pergunta de múltipla escolha ou única escolha
@@ -88,26 +102,30 @@ class AnamnesisController extends Controller
     // ✅ Obter os detalhes de uma pergunta
     public function show($id)
     {
-        $question = AnamnesisQuestion::with('options')->findOrFail($id);
+        $question = AnamnesisQuestion::with(['options', 'section'])->findOrFail($id);
         return response()->json($question);
     }
 
     // ✅ Atualizar uma pergunta e suas opções associadas
     public function update(Request $request, $id)
     {
+        Log::info('Dados recebidos no request:', $request->all());
+
         $question = AnamnesisQuestion::findOrFail($id);
 
         $request->validate([
             'question' => 'required|string|max:255',
             'type' => 'required|in:single_choice,multiple_choice,text',
             'options' => 'nullable|array',
-            'options.*' => 'required|string|max:255'
+            'options.*' => 'required|string|max:255',
+            'anamnesis_section_id' => 'required|exists:anamnesis_sections,id',
         ]);
 
         // Atualizar os dados da pergunta
         $question->update([
             'question' => $request->question,
             'type' => $request->type,
+            'anamnesis_section_id' => $request->anamnesis_section_id,
         ]);
 
         // Atualizar opções apenas se for single_choice ou multiple_choice
@@ -136,5 +154,14 @@ class AnamnesisController extends Controller
         $question->delete();
 
         return response()->json(['message' => 'Question deleted successfully']);
+    }
+
+    public function reorder(Request $request)
+    {
+        foreach ($request->questions as $item) {
+            AnamnesisQuestion::where('id', $item['id'])->update(['order' => $item['order']]);
+        }
+
+        return response()->json(['message' => 'Order updated']);
     }
 }

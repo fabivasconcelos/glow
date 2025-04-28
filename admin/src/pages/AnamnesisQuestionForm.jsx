@@ -10,19 +10,27 @@ const AnamnesisQuestionForm = () => {
         question: "",
         type: "single_choice",
         options: [""],
+        anamnesis_section_id: ""
     });
+    const [sections, setSections] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const isEditing = !!id;
 
     useEffect(() => {
+        // Carregar seções para o dropdown
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/anamnesis/sections`)
+            .then(response => setSections(response.data))
+            .catch(error => console.error("Erro ao buscar seções", error));
+
         if (isEditing) {
             axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/anamnesis/questions/${id}`)
                 .then(response => {
-                    const { question, type, options } = response.data;
+                    const { question, type, options, anamnesis_section_id } = response.data;
                     setFormData({
                         question,
                         type,
+                        anamnesis_section_id: anamnesis_section_id || "",
                         options: options.length > 0 ? options.map(opt => opt.option) : [""]
                     });
                 })
@@ -56,9 +64,12 @@ const AnamnesisQuestionForm = () => {
         e.preventDefault();
         setLoading(true);
         setError(null);
-        
+
         try {
-            const payload = { ...formData, options: formData.options.filter(opt => opt.trim() !== "") };
+            const payload = {
+                ...formData,
+                options: formData.options.filter(opt => opt.trim() !== "")
+            };
             if (isEditing) {
                 await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/anamnesis/questions/${id}`, payload);
             } else {
@@ -80,11 +91,11 @@ const AnamnesisQuestionForm = () => {
             <form onSubmit={handleSubmit}>
                 <div className="mb-4">
                     <label className="block text-gray-700">Question</label>
-                    <input 
-                        type="text" 
-                        name="question" 
-                        value={formData.question} 
-                        onChange={handleChange} 
+                    <input
+                        type="text"
+                        name="question"
+                        value={formData.question}
+                        onChange={handleChange}
                         className="w-full p-2 border rounded"
                         required
                     />
@@ -97,14 +108,23 @@ const AnamnesisQuestionForm = () => {
                         <option value="text">Text</option>
                     </select>
                 </div>
+                <div className="mb-4">
+                    <label className="block text-gray-700">Section</label>
+                    <select name="anamnesis_section_id" value={formData.anamnesis_section_id} onChange={handleChange} className="w-full p-2 border rounded" required>
+                        <option value="">Select a section</option>
+                        {sections.map(section => (
+                            <option key={section.id} value={section.id}>{section.name}</option>
+                        ))}
+                    </select>
+                </div>
                 {(formData.type !== "text") && (
                     <div className="mb-4">
                         <label className="block text-gray-700">Options</label>
                         {formData.options.map((option, index) => (
                             <div key={index} className="flex items-center space-x-2 mb-2">
-                                <input 
-                                    type="text" 
-                                    value={option} 
+                                <input
+                                    type="text"
+                                    value={option}
                                     onChange={(e) => handleOptionChange(index, e.target.value)}
                                     className="w-full p-2 border rounded"
                                     required

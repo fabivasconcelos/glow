@@ -9,7 +9,7 @@ class AnamnesisQuestion extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['question', 'type'];
+    protected $fillable = ['question', 'type', 'anamnesis_section_id', 'order'];
 
     public function options()
     {
@@ -19,5 +19,10 @@ class AnamnesisQuestion extends Model
     public function answers()
     {
         return $this->hasMany(AnamnesisAnswer::class, 'question_id');
+    }
+
+    public function section()
+    {
+        return $this->belongsTo(AnamnesisSection::class, 'anamnesis_section_id');
     }
 }

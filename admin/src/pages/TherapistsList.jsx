@@ -28,16 +28,26 @@ const TherapistsList = () => {
             <table className="w-full border-collapse border border-gray-300">
                 <thead>
                     <tr className="bg-gray-200">
+                        <th className="border border-gray-300 px-4 py-2">Photo</th>
                         <th className="border border-gray-300 px-4 py-2">Name</th>
+                        <th className="border border-gray-300 px-4 py-2">E-mail</th>
                         <th className="border border-gray-300 px-4 py-2">Specialization</th>
+                        <th className="border border-gray-300 px-4 py-2">Status</th>
+                        <th className="border border-gray-300 px-4 py-2">Plan</th>
                         <th className="border border-gray-300 px-4 py-2">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {therapists.map((therapist) => (
                         <tr key={therapist.id} className="border border-gray-300">
-                            <td className="border border-gray-300 px-4 py-2">{therapist.name}</td>
-                            <td className="border border-gray-300 px-4 py-2">{therapist.specialization}</td>
+                            <td className="border border-gray-300 px-4 py-2">
+                                <img src={therapist.profile_picture} alt={therapist.name} className="w-20 h-auto" />
+                            </td>
+                            <td className="border border-gray-300 px-4 py-2">{therapist.full_name}</td>
+                            <td className="border border-gray-300 px-4 py-2">{therapist.contact_email}</td>
+                            <td className="border border-gray-300 px-4 py-2">{therapist.professional_title}</td>
+                            <td className="border border-gray-300 px-4 py-2">{therapist.status}</td>
+                            <td className="border border-gray-300 px-4 py-2">{therapist.plan}</td>
                             <td className="border border-gray-300 px-4 py-2">
                                 <Link to={`/therapists/edit/${therapist.id}`} className="text-blue-500 mr-2">
                                     Edit

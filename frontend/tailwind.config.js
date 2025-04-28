@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
+        inter: ["Inter", "sans-serif"],
         gloock: ["Gloock", "serif"], // Fonte do título da pergunta
       },
       colors: {
