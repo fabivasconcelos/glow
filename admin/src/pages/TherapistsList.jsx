@@ -49,6 +49,9 @@ const TherapistsList = () => {
                             <td className="border border-gray-300 px-4 py-2">{therapist.status}</td>
                             <td className="border border-gray-300 px-4 py-2">{therapist.plan}</td>
                             <td className="border border-gray-300 px-4 py-2">
+                                <Link to={`/therapists/view/${therapist.id}`} className="text-blue-500 mr-2">
+                                    View
+                                </Link>
                                 <Link to={`/therapists/edit/${therapist.id}`} className="text-blue-500 mr-2">
                                     Edit
                                 </Link>

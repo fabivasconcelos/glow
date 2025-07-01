@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             SpecializationsSeeder::class,
             SpecializedDemographicsSeeder::class,
             LanguagesSeeder::class,
-            TherapistSeeder::class
+            //TherapistSeeder::class
         ]);
     }
 }

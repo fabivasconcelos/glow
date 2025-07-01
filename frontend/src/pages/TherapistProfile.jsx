@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import glowLogo from "/app/glow-logo.png";
 
 const TherapistProfile = () => {
     const { id } = useParams();
@@ -39,7 +38,7 @@ const TherapistProfile = () => {
             <div className="max-w-[900px] mx-auto px-6 md:px-12">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-4">
-                    <img src={glowLogo} alt="Glow" className="w-24 h-auto" />
+                    <img src="/app/glow-logo-orange.png" alt="Glow" className="w-24 h-auto" />
                     <div className="flex items-center space-x-4">
                         <button
                             onClick={prevTherapist}

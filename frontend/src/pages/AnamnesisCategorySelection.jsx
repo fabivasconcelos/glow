@@ -1,7 +1,6 @@
 // src/pages/AnamnesisCategorySelection.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
-import glowLogo from "/app/glow-logo-orange.png";
 import { useNavigate } from "react-router-dom";
 
 const AnamnesisCategorySelection = () => {
@@ -26,7 +25,7 @@ const AnamnesisCategorySelection = () => {
         >
             {/* Header */}
             <div className="flex justify-between items-center">
-                <img src={glowLogo} alt="Glow Logo" className="w-[590px] absolute top-0 left-0" />
+                <img src="/app/glow-logo-orange.png" alt="Glow Logo" className="w-[590px] absolute top-0 left-0" />
                 {/* <p className="text-sm md:text-base ml-auto mr-4">Part 1: Initial Assessment (2 minutes)</p> */}
             </div>
 

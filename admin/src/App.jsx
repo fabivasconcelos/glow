@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import TherapistsList from "./pages/TherapistsList";
+import TherapistView from "./pages/TherapistView";
 import TherapistForm from "./pages/TherapistForm";
 import AnamnesisQuestionsList from "./pages/AnamnesisQuestionsList";
 import AnamnesisQuestionForm from "./pages/AnamnesisQuestionForm";
@@ -25,6 +26,7 @@ function App() {
           <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
           <Route path="/therapists" element={<Layout><TherapistsList /></Layout>} />
           <Route path="/therapists/new" element={<Layout><TherapistForm /></Layout>} />
+          <Route path="/therapists/view/:id" element={<Layout><TherapistView /></Layout>} />
           <Route path="/therapists/edit/:id" element={<Layout><TherapistForm /></Layout>} />
           <Route path="/anamnesis/questions" element={<Layout><AnamnesisQuestionsList /></Layout>} />
           <Route path="/anamnesis/questions/new" element={<Layout><AnamnesisQuestionForm /></Layout>} />

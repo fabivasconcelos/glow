@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import glowLogo from "/app/glow-logo-brown.png"; // Verifique o caminho correto
 import { ChevronLeft } from "lucide-react";
 
 const ScheduleMeeting = () => {
@@ -46,7 +45,7 @@ const ScheduleMeeting = () => {
             <div className="max-w-[900px] mx-auto px-6 md:px-12 w-full">
                 {/* Header */}
                 <div className="w-full flex justify-between items-center mb-6">
-                    <img src={glowLogo} alt="Glow" className="w-20 h-auto" />
+                    <img src="/app/glow-logo-brown.png" alt="Glow" className="w-20 h-auto" />
                     <button
                         onClick={() => navigate(-1)}
                         className="w-10 h-10 flex items-center justify-center border-2 border-[#DB8F00] rounded-full text-[#DB8F00]"

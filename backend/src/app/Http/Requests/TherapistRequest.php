@@ -12,7 +12,7 @@ class TherapistRequest extends FormRequest
             'full_name' => 'required|string|max:255',
             'gender' => 'required|in:male,female',
             'professional_title' => 'nullable|string|max:255',
-            'professional_website' => 'nullable|url|max:255',
+            'professional_website' => 'nullable|string|max:255',
             'contact_email' => 'nullable|email|max:255',
             'years_experience' => 'nullable|integer',
             'education_background' => 'nullable|string',
@@ -56,7 +56,7 @@ class TherapistRequest extends FormRequest
         }
 
         if ($this->hasFile('intro_video')) {
-            $rules['intro_video'] = 'nullable|mimes:mp4,quicktime';
+            $rules['intro_video'] = 'nullable|video';
         }
 
         return $rules;

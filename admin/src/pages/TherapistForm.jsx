@@ -240,7 +240,6 @@ const TherapistForm = () => {
                 Professional Website
               </label>
               <input
-                type="url"
                 name="professional_website"
                 value={formData.professional_website}
                 onChange={handleChange}
@@ -255,6 +254,7 @@ const TherapistForm = () => {
               </label>
               <input
                 type="email"
+                required
                 name="contact_email"
                 value={formData.contact_email}
                 onChange={handleChange}

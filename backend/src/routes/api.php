@@ -58,5 +58,4 @@ Route::apiResource('specializations', SpecializationController::class);
 Route::apiResource('specialized-demographics', SpecializedDemographicController::class);
 
 // Rotas para Languages
-Route::apiResource('languages', LanguageController::class);
-
+Route::get('/languages', [LanguageController::class, "index"]);

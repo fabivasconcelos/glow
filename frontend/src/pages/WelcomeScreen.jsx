@@ -1,6 +1,5 @@
 // src/pages/WelcomeScreen.tsx
 import { useNavigate } from "react-router-dom";
-import glowLogo from "/app/glow-logo-orange.png"; // ajuste o caminho conforme necessário
 
 const WelcomeScreen = () => {
   const navigate = useNavigate();
@@ -8,7 +7,7 @@ const WelcomeScreen = () => {
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[#FAE1B8] to-[#FCE5BB] flex flex-col items-start justify-center px-6 relative">
       {/* Logo no topo esquerdo */}
-      <img src={glowLogo} alt="Glow Logo" className="w-[590px] absolute top-0 left-0" />
+      <img src="/app/glow-logo-orange.png" alt="Glow Logo" className="w-[590px] absolute top-0 left-0" />
 
       {/* Card central */}
       <div className="mx-auto w-full max-w-md bg-white rounded-2xl shadow-2xl px-8 py-10 text-center z-10">
