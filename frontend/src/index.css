@@ -19,6 +19,12 @@ body {
   background-position: center;
 }
 
+.recommendations-bg {
+  background-image: url('/app/recommendations-bg.png');
+  background-size: cover;
+  background-position: center;
+}
+
 @media (min-width: 1024px) {
 
   /* Desktop */
