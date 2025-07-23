@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 const TherapistForm = () => {
-
     const navigate = useNavigate();
+    const isMobile = useIsMobile();
     const [currentStep, setCurrentStep] = useState(1);
+    const [currentBackground, setCurrentBackground] = useState("/app/new-therapist-bg-1.png");
+    const TOTAL_STEPS = 11;
     const [formData, setFormData] = useState({
         full_name: "",
         gender: "male",
@@ -49,6 +52,7 @@ const TherapistForm = () => {
     const [languages, setLanguages] = useState([]);
     const [anamnesisCategories, setAnamnesisCategories] = useState([]);
     const [otherIds, setOtherIds] = useState({ specialization: null, demographic: null, language: null });
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         fetchOptions();
@@ -102,7 +106,8 @@ const TherapistForm = () => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
+        setLoading(true);
         const form = new FormData();
 
         for (const key in formData) {
@@ -135,707 +140,974 @@ const TherapistForm = () => {
             );
             navigate('/therapist/new/confirmation')
         } catch (error) {
-            console.error("Erro ao salvar terapeuta:", error);
+            setLoading(false);
+            alert("Erro ao salvar terapeuta:", error);
         }
     };
 
     const handleNextStep = () => {
-        const requiredFields = [
-            "full_name",
-            "contact_email"
-        ];
-
-        for (const field of requiredFields) {
-            const inputElement = document.querySelector(`[name="${field}"]`);
-
-            if (inputElement) {
-                // Se o campo for um upload de arquivo
-                if (inputElement.type === "file" && !formData[field]) {
-                    inputElement.focus();
-                    inputElement.scrollIntoView({ behavior: "smooth", block: "center" });
-                    return;
-                }
-
-                // Verificar campos de texto e selects
-                if (!inputElement.value.trim()) {
-                    inputElement.focus();
-                    inputElement.scrollIntoView({ behavior: "smooth", block: "center" });
-                    return;
-                }
-            }
+        switch (currentStep) {
+            case currentStep <= 4:
+                setCurrentBackground('/app/new-therapist-bg-1.png');
+                break;
+            default:
+                setCurrentBackground('/app/new-therapist-bg-2.png');
+        };
+        if (currentStep == TOTAL_STEPS) {
+            handleSubmit();
+        } else {
+            setCurrentStep(currentStep + 1);
         }
+    };
 
-        setCurrentStep(2);
+    const handleBack = () => {
+        currentStep > 1 ? setCurrentStep(currentStep - 1) : navigate(-1);
+    };
+
+    const increment = isMobile ? 2 : 0.5;
+    const progressPercent = (((currentStep + increment) / TOTAL_STEPS) * 100);
+
+    const step_1_content = () => {
+        return (
+            <>
+                <h1 className="w-full lg:px-20 px-4 text-center text-[32px] text-[#453B2C] font-[400] mb-10 leading-tight font-gloock flex items-center justify-center gap-2 flex-wrap">
+                    Glow Therapist Profile Questionnaire
+                </h1>
+                <h3 className="w-full text-center text-[16px] text-[#453B2C] font-[400] leading-tight font-inter flex items-center justify-center flex-wrap">
+                    Thank you for your interest in joining Glow's exclusive network of therapeutic professionals. Please complete the following information to create your profile.
+                </h3>
+                <h2 className="w-full text-center text-[24px] text-[#453B2C] font-[400] leading-tight font-gloock flex items-center justify-center flex-wrap my-12">
+                    Basic Information
+                </h2>
+                <div className="flex flex-col gap-y-4 lg:px-28">
+                    {/* Full Name + Gender */}
+                    <div className="flex flex-col md:flex-row gap-4">
+                        <div className="flex flex-col w-full">
+                            <label htmlFor="full_name" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-1">Full Name</label>
+                            <input
+                                type="text"
+                                name="full_name"
+                                value={formData.full_name}
+                                onChange={handleChange}
+                                className="w-full h-12 rounded-2xl px-4 bg-[#FFF9F1] text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-md"
+                            />
+                        </div>
+
+                        <div className="flex flex-col w-full md:max-w-[200px]">
+                            <label htmlFor="gender" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-1">Gender</label>
+                            <select
+                                name="gender"
+                                className="w-full h-12 rounded-2xl px-4 bg-[#FFF9F1] text-sm text-black appearance-none focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-md"
+                            >
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-4">
+                        <div className="flex flex-col w-full">
+                            <label htmlFor="professional_title" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-1">Professional Title</label>
+                            <input
+                                type="text"
+                                name="professional_title"
+                                value={formData.professional_title}
+                                onChange={handleChange}
+                                className="w-full h-12 rounded-2xl px-4 bg-[#FFF9F1] text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-md"
+                            />
+                        </div>
+                        <div className="flex flex-col w-full">
+                            <label htmlFor="contact_email" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-1">Contact Email</label>
+                            <input
+                                type="email"
+                                name="contact_email"
+                                value={formData.contact_email}
+                                onChange={handleChange}
+                                className="w-full h-12 rounded-2xl px-4 bg-[#FFF9F1] text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-md"
+                            />
+                        </div>
+                        <div className="flex flex-col w-full">
+                            <label htmlFor="professional_website" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-1">Professional Website</label>
+                            <input
+                                type="text"
+                                name="professional_website"
+                                value={formData.professional_website}
+                                onChange={handleChange}
+                                className="w-full h-12 rounded-2xl px-4 bg-[#FFF9F1] text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-md"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    };
+
+    const step_2_content = () => {
+        return (
+            <>
+                <h2 className="w-full text-center text-[24px] mb-8 text-[#453B2C] font-[400] leading-tight font-gloock flex items-center justify-center flex-wrap">
+                    Professional Experience
+                </h2>
+                <div className="flex flex-col gap-4 lg:px-28">
+                    <div className="flex flex-col w-full">
+                        <label htmlFor="years_experience" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-1">Years of professional practice experience</label>
+                        <input
+                            type="number"
+                            name="years_experience"
+                            value={formData.years_experience}
+                            onChange={handleChange}
+                            className="w-full h-12 rounded-2xl px-4 bg-[#FFF9F1] text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-md"
+                        />
+                    </div>
+                    <div className="flex flex-col w-full">
+                        <label htmlFor="education_background" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-1">Educational background <span className="font-[300]">(degrees, certifications, specialized training)</span></label>
+                        <input
+                            type="text"
+                            name="education_background"
+                            value={formData.education_background}
+                            onChange={handleChange}
+                            className="w-full h-12 rounded-2xl px-4 bg-[#FFF9F1] text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-md"
+                        />
+                    </div>
+                    <h2 className="w-full text-center text-[24px] text-[#453B2C] font-[400] leading-tight font-gloock flex items-center justify-center flex-wrap my-4">
+                        Professional Bio
+                    </h2>
+                    <div className="flex flex-col w-full">
+                        <label htmlFor="professional_bio" className="text-[14px] text-center font-[500] font-inter text-[#453B2C] mb-1">
+                            Please provide a concise professional bio (100-150 words) highlighting your approach, philosophy, and what makes your practice unique. This will be displayed to potential clients.
+                        </label>
+                        <textarea
+                            name="professional_bio"
+                            value={formData.professional_bio}
+                            onChange={handleChange}
+                            className="w-full p-4 mt-4 rounded-2xl bg-white shadow-md text-[14px] font-inter
+                        focus:outline-none focus:ring-2 focus:ring-yellow-400 block resize-none
+                        placeholder:text-[#453B2C] placeholder:italic placeholder:font-medium font-inter"
+                            rows={10}
+                        />
+                    </div>
+                </div>
+            </>
+        );
+    };
+
+    const step_3_content = () => {
+        return (
+            <>
+                <h2 className="w-full text-center text-[24px] text-[#453B2C] font-[400] leading-tight font-gloock flex items-center justify-center flex-wrap mb-4">
+                    Primary Focus
+                </h2>
+                <div className="flex flex-col gap-4 lg:px-28">
+                    <div className="flex flex-col w-full">
+                        {anamnesisCategories.map((cat) => (
+                            <div key={cat.id} className="flex items-center space-x-2 my-1">
+                                <label
+                                    key={cat.id}
+                                    className="flex items-center space-x-4 cursor-pointer text-[#453B2C] font-[500] font-inter text-[18px]"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        value={cat.id}
+                                        checked={formData.anamnesis_category_ids.includes(cat.id)}
+                                        onChange={(e) =>
+                                            handleMultiSelect(e, "anamnesis_category_ids")
+                                        }
+                                        className="hidden"
+                                    />
+
+                                    {/* Estilo do radio button customizado */}
+                                    <div className="w-6 h-6 flex items-center justify-center">
+                                        <div
+                                            className={`w-6 h-6 rounded-2xl border-[2px] border-[#453B2C] flex items-center justify-center`}
+                                        >
+                                            <div
+                                                className={`w-3.5 h-3.5 rounded-2xl ${formData.anamnesis_category_ids.includes(cat.id)
+                                                    ? "bg-[#453B2C]"
+                                                    : "bg-transparent"
+                                                    }`}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <span className="font-[700]">{cat.name}</span>
+                                    <span className="font-[400]"> ({cat.subtitle})</span>
+                                </label>
+                            </div>
+                        ))}
+                        <h2 className="w-full text-center text-[24px] text-[#453B2C] font-[400] leading-tight font-gloock flex items-center justify-center flex-wrap my-6">
+                            Visual Assets
+                        </h2>
+                        <div className="flex flex-col w-full items-center justify-center">
+                            <label htmlFor="profile_picture" className="text-[14px] text-center font-[500] font-inter text-[#453B2C]">
+                                Professional Headshot: Please upload a high-resolution professional photo (guidelines: well-lit, neutral background, professional attire)
+                            </label>
+                            <input
+                                type="file"
+                                id="profile_picture"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            profile_picture: e.target.files[0],
+                                        }));
+                                    }
+                                }}
+                            />
+
+                            <label
+                                htmlFor="profile_picture"
+                                className="w-[170px] bg-white text-[#453B2C] font-bold font-inter text-[14px] px-6 py-5 rounded-3xl hover:bg-gray-50 transition text-center cursor-pointer my-8"
+                            >
+                                {formData.profile_picture ? formData.profile_picture.name : "UPLOAD PHOTO"}
+                            </label>
+
+                            <label htmlFor="intro_video" className="text-[14px] text-center font-[500] font-inter text-[#453B2C]">
+                                Introduction Video: Please upload a 30-60 second video introducing yourself and briefly explaining your approach to therapy/coaching (guidelines: good lighting, clear audio, professional setting)
+                            </label>
+                            <input
+                                type="file"
+                                id="intro_video"
+                                accept="video/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            intro_video: e.target.files[0],
+                                        }));
+                                    }
+                                }}
+                            />
+
+                            <label
+                                htmlFor="intro_video"
+                                className="w-[170px] bg-white text-[#453B2C] font-bold font-inter text-[14px] px-6 py-5 rounded-3xl hover:bg-gray-50 transition text-center cursor-pointer my-8"
+                            >
+                                {formData.intro_video ? formData.intro_video.name : "UPLOAD VIDEO"}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    };
+
+    const step_4_content = () => {
+        return (
+            <>
+                <h1 className="w-full lg:px-20 px-4 text-center text-[32px] text-[#453B2C] font-[400] mb-4 leading-tight font-gloock flex items-center justify-center flex-wrap">
+                    Key Differentiators
+                </h1>
+                <h3 className="w-full text-center px-4 text-[16px] text-[#453B2C] font-[400] leading-tight font-inter flex items-center justify-center flex-wrap">
+                    This section is critical for matching you with compatible clients. Please provide at least 5 specific, concise differentiators that make your practice unique (the more you can provide, the better we can match you with ideal clients):
+                </h3>
+                <h2 className="w-full text-center text-[24px] text-[#453B2C] font-[400] leading-tight font-gloock flex items-center justify-center flex-wrap my-12">
+                    Specific Differentiators
+                </h2>
+                <div className="flex flex-col gap-y-4 lg:px-28">
+                    <div className="flex flex-col gap-4">
+                        <div className="flex flex-col w-full">
+                            <label htmlFor="specialized_skill_expertise" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-1">Specialized skill/expertise</label>
+                            <input
+                                type="text"
+                                name="specialized_skill_expertise"
+                                placeholder={`e.g., "Specialized in executive burnout"`}
+                                value={formData.specialized_skill_expertise}
+                                onChange={handleChange}
+                                className="w-full h-12 rounded-2xl px-4 bg-[#FFF9F1] text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-md"
+                            />
+                        </div>
+                        <div className="flex flex-col w-full">
+                            <label htmlFor="unique_therapeutic_approach" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-1">Unique therapeutic approach</label>
+                            <input
+                                type="text"
+                                name="unique_therapeutic_approach"
+                                value={formData.unique_therapeutic_approach}
+                                placeholder={`e.g., "EMDR trauma resolution expert"`}
+                                onChange={handleChange}
+                                className="w-full h-12 rounded-2xl px-4 bg-[#FFF9F1] text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-md"
+                            />
+                        </div>
+                        <div className="flex flex-col w-full">
+                            <label htmlFor="demographic_specialty" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-1">Demographic specialty</label>
+                            <input
+                                type="text"
+                                name="demographic_specialty"
+                                placeholder={`e.g., "Specialized in teenagers"`}
+                                value={formData.demographic_specialty}
+                                onChange={handleChange}
+                                className="w-full h-12 rounded-2xl px-4 bg-[#FFF9F1] text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-md"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    };
+
+    const step_5_content = () => {
+        return (
+            <>
+                <h1 className="w-full lg:px-20 px-4 text-center text-[32px] text-[#453B2C] font-[400] mb-4 leading-tight font-gloock flex items-center justify-center flex-wrap">
+                    Specific Differentiators
+                </h1>
+                <div className="flex flex-col gap-y-4 lg:px-28">
+                    <div className="flex flex-col gap-4">
+                        <div className="flex flex-col w-full">
+                            <label htmlFor="outcome_expertise" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-1">Outcome expertise</label>
+                            <input
+                                type="text"
+                                name="outcome_expertise"
+                                placeholder={`e.g., "Rapid anxiety reduction techniques"`}
+                                value={formData.outcome_expertise}
+                                onChange={handleChange}
+                                className="w-full h-12 rounded-2xl px-4 bg-[#FFF9F1] text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-md"
+                            />
+                        </div>
+                        <div className="flex flex-col w-full">
+                            <label htmlFor="unique_background_perspective" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-1">Unique background/perspective</label>
+                            <input
+                                type="text"
+                                name="unique_background_perspective"
+                                value={formData.unique_background_perspective}
+                                placeholder={`e.g., "Former CEO, understands executive pressure"`}
+                                onChange={handleChange}
+                                className="w-full h-12 rounded-2xl px-4 bg-[#FFF9F1] text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-md"
+                            />
+                        </div>
+                        <div className="flex flex-col w-full">
+                            <label htmlFor="additional_differentiator_1" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-1">Additional differentiator</label>
+                            <input
+                                type="text"
+                                name="additional_differentiator_1"
+                                value={formData.additional_differentiator_1}
+                                onChange={handleChange}
+                                className="w-full h-12 rounded-2xl px-4 bg-[#FFF9F1] text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-md"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    };
+
+    const step_6_content = () => {
+        return (
+            <>
+                <h1 className="w-full lg:px-20 px-4 text-center text-[32px] text-[#453B2C] font-[400] mb-4 leading-tight font-gloock flex items-center justify-center flex-wrap">
+                    Specializations & Skills
+                </h1>
+                <div className="flex flex-col gap-y-4 lg:px-8">
+                    <label htmlFor="additional_differentiator_1" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-4 text-center">(Select all that apply)</label>
+                    <div className={`${specializations.length > 10 && !isMobile ? "grid grid-cols-2 gap-x-12" : "flex flex-col w-full"
+                        }`}>
+                        {specializations.map((spec) => (
+                            <div key={spec.id} className="flex items-center space-x-2 my-1">
+                                <label
+                                    key={spec.id}
+                                    className="flex items-center space-x-4 cursor-pointer text-[#453B2C] font-[500] font-inter text-[18px]"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        value={spec.id}
+                                        checked={formData.specialization_ids.includes(spec.id)}
+                                        onChange={(e) =>
+                                            handleMultiSelect(e, "specialization_ids")
+                                        }
+                                        className="hidden"
+                                    />
+
+                                    {/* Estilo do radio button customizado */}
+                                    <div className="w-6 h-6 flex items-center justify-center">
+                                        <div
+                                            className={`w-6 h-6 rounded-2xl border-[2px] border-[#453B2C] flex items-center justify-center`}
+                                        >
+                                            <div
+                                                className={`w-3.5 h-3.5 rounded-2xl ${formData.specialization_ids.includes(spec.id)
+                                                    ? "bg-[#453B2C]"
+                                                    : "bg-transparent"
+                                                    }`}
+                                            />
+                                        </div>
+                                    </div>
+                                    <span className="font-[700]">{spec.name}</span>
+                                </label>
+                            </div>
+                        ))}
+                    </div>
+                    {/* Campo para digitar o "Other" */}
+                    {otherIds.specialization && formData.specialization_ids.includes(otherIds.specialization) && (
+                        <div className="flex flex-col w-full">
+                            <textarea
+                                name="specialization_other"
+                                placeholder="(please specify any additional therapeutic methods you utilize):"
+                                value={formData.specialization_other}
+                                onChange={handleChange}
+                                className="w-full p-4 mt-4 rounded-2xl bg-white shadow-md text-[14px] font-inter
+                        focus:outline-none focus:ring-2 focus:ring-yellow-400 block resize-none
+                        placeholder:text-[#453B2C] placeholder:italic placeholder:font-medium font-inter"
+                                rows={10}
+                            />
+                        </div>
+                    )}
+                </div>
+            </>
+        );
+    };
+
+    const step_7_content = () => {
+        return (
+            <>
+                <h1 className="w-full lg:px-20 px-4 text-center text-[32px] text-[#453B2C] font-[400] mb-4 leading-tight font-gloock flex items-center justify-center flex-wrap">
+                    Specialized Demographics
+                </h1>
+                <div className="flex flex-col gap-y-4 lg:px-8">
+                    <label htmlFor="additional_differentiator_1" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-4 text-center">(Select all that apply)</label>
+                    <div className={`${demographics.length > 10 && !isMobile ? "grid grid-cols-2 gap-x-12" : "flex flex-col w-full"
+                        }`}>
+                        {demographics.map((demo) => (
+                            <div key={demo.id} className="flex items-center space-x-2 my-1">
+                                <label
+                                    key={demo.id}
+                                    className="flex items-center space-x-4 cursor-pointer text-[#453B2C] font-[500] font-inter text-[18px]"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        value={demo.id}
+                                        checked={formData.specialized_demographic_ids.includes(demo.id)}
+                                        onChange={(e) =>
+                                            handleMultiSelect(e, "specialized_demographic_ids")
+                                        }
+                                        className="hidden"
+                                    />
+
+                                    {/* Estilo do radio button customizado */}
+                                    <div className="w-6 h-6 flex items-center justify-center">
+                                        <div
+                                            className={`w-6 h-6 rounded-2xl border-[2px] border-[#453B2C] flex items-center justify-center`}
+                                        >
+                                            <div
+                                                className={`w-3.5 h-3.5 rounded-2xl ${formData.specialized_demographic_ids.includes(demo.id)
+                                                    ? "bg-[#453B2C]"
+                                                    : "bg-transparent"
+                                                    }`}
+                                            />
+                                        </div>
+                                    </div>
+                                    <span className="font-[700]">{demo.name}</span>
+                                </label>
+                            </div>
+                        ))}
+                    </div>
+                    {/* Campo para digitar o "Other" */}
+                    {otherIds.demographic && formData.specialized_demographic_ids.includes(otherIds.demographic) && (
+                        <div className="flex flex-col w-full">
+                            <textarea
+                                name="specialized_demographic_other"
+                                placeholder="(Please specify any additional therapeutic methods you utilize):"
+                                value={formData.specialized_demographic_other}
+                                onChange={handleChange}
+                                className="w-full p-4 mt-4 rounded-2xl bg-white shadow-md text-[14px] font-inter
+                        focus:outline-none focus:ring-2 focus:ring-yellow-400 block resize-none
+                        placeholder:text-[#453B2C] placeholder:italic placeholder:font-medium font-inter"
+                                rows={10}
+                            />
+                        </div>
+                    )}
+                </div>
+            </>
+        );
+    };
+
+    const step_8_content = () => {
+        return (
+            <>
+                <h1 className="w-full lg:px-20 px-4 text-center text-[32px] text-[#453B2C] font-[400] mb-8 leading-tight font-gloock flex items-center justify-center flex-wrap">
+                    Session Information
+                </h1>
+                <div className="flex flex-col gap-y-4 lg:px-8">
+                    <div className="grid grid-cols-2 lg:px-24">
+                        <label
+                            className="flex items-center space-x-4 cursor-pointer text-[#453B2C] font-[500] font-inter text-[18px]"
+                        >
+                            <input
+                                type="checkbox"
+                                name="remote_sessions"
+                                checked={formData.remote_sessions}
+                                onChange={handleChange}
+                                className="hidden"
+                            />
+
+                            {/* Estilo do radio button customizado */}
+                            <div className="w-6 h-6 flex items-center justify-center">
+                                <div
+                                    className={`w-6 h-6 rounded-2xl border-[2px] border-[#453B2C] flex items-center justify-center`}
+                                >
+                                    <div
+                                        className={`w-3.5 h-3.5 rounded-2xl ${formData.remote_sessions
+                                            ? "bg-[#453B2C]"
+                                            : "bg-transparent"
+                                            }`}
+                                    />
+                                </div>
+                            </div>
+                            <span className="font-[700]">Remote sessions?</span>
+                        </label>
+                        <label
+                            className="flex items-center space-x-4 cursor-pointer text-[#453B2C] font-[500] font-inter text-[18px]"
+                        >
+                            <input
+                                type="checkbox"
+                                name="in_person_sessions"
+                                checked={formData.in_person_sessions}
+                                onChange={handleChange}
+                                className="hidden"
+                            />
+
+                            {/* Estilo do radio button customizado */}
+                            <div className="w-6 h-6 flex items-center justify-center">
+                                <div
+                                    className={`w-6 h-6 rounded-2xl border-[2px] border-[#453B2C] flex items-center justify-center`}
+                                >
+                                    <div
+                                        className={`w-3.5 h-3.5 rounded-2xl ${formData.in_person_sessions
+                                            ? "bg-[#453B2C]"
+                                            : "bg-transparent"
+                                            }`}
+                                    />
+                                </div>
+                            </div>
+                            <span className="font-[700]">In-person sessions?</span>
+                        </label>
+                    </div>
+                    <div className="flex flex-col w-full lg:px-28">
+                        <label htmlFor="professional_bio" className="text-[14px] text-center font-[500] font-inter text-[#453B2C] mb-1">
+                            Geographic location(s) for in-person sessions
+                        </label>
+                        <textarea
+                            name="geographic_location"
+                            placeholder="(Please specify):"
+                            value={formData.geographic_location}
+                            onChange={handleChange}
+                            className="w-full p-4 mt-4 rounded-2xl bg-white shadow-md text-[14px] font-inter
+                        focus:outline-none focus:ring-2 focus:ring-yellow-400 block resize-none
+                        placeholder:text-[#453B2C] placeholder:italic placeholder:font-medium font-inter"
+                            rows={3}
+                        />
+                    </div>
+                </div>
+                <h1 className="w-full lg:px-20 px-4 text-center text-[32px] text-[#453B2C] font-[400] my-8 leading-tight font-gloock flex items-center justify-center flex-wrap">
+                    Session Details
+                </h1>
+                <div className="flex flex-col gap-y-4 lg:px-24">
+                    <div className="flex flex-col w-full">
+                        <label
+                            className="flex items-center space-x-4 cursor-pointer text-[#453B2C] font-[500] font-inter text-[18px]"
+                        >
+                            <input
+                                type="checkbox"
+                                name="hands_on_approach"
+                                checked={formData.hands_on_approach}
+                                onChange={handleChange}
+                                className="hidden"
+                            />
+
+                            {/* Estilo do radio button customizado */}
+                            <div className="w-6 h-6 flex items-center justify-center">
+                                <div
+                                    className={`w-6 h-6 rounded-2xl border-[2px] border-[#453B2C] flex items-center justify-center`}
+                                >
+                                    <div
+                                        className={`w-3.5 h-3.5 rounded-2xl ${formData.hands_on_approach
+                                            ? "bg-[#453B2C]"
+                                            : "bg-transparent"
+                                            }`}
+                                    />
+                                </div>
+                            </div>
+                            <span className="font-[700]">Therapeutic approaches includes appropriate physical touch</span>
+                        </label>
+                        <label
+                            className="flex items-center space-x-4 cursor-pointer text-[#453B2C] font-[500] font-inter text-[18px]"
+                        >
+                            <input
+                                type="checkbox"
+                                name="esoteric_frameworks"
+                                checked={formData.esoteric_frameworks}
+                                onChange={handleChange}
+                                className="hidden"
+                            />
+
+                            {/* Estilo do radio button customizado */}
+                            <div className="w-6 h-6 flex items-center justify-center">
+                                <div
+                                    className={`w-6 h-6 rounded-2xl border-[2px] border-[#453B2C] flex items-center justify-center`}
+                                >
+                                    <div
+                                        className={`w-3.5 h-3.5 rounded-2xl ${formData.esoteric_frameworks
+                                            ? "bg-[#453B2C]"
+                                            : "bg-transparent"
+                                            }`}
+                                    />
+                                </div>
+                            </div>
+                            <span className="font-[700]">Do you incorporate esoteric or alternative frameworks?</span>
+                        </label>
+                        <textarea
+                            name="esoteric_frameworks_details"
+                            placeholder="(If yes, please specify):"
+                            value={formData.esoteric_frameworks_details}
+                            onChange={handleChange}
+                            className="w-full p-4 mt-4 rounded-2xl bg-white shadow-md text-[14px] font-inter
+                        focus:outline-none focus:ring-2 focus:ring-yellow-400 block resize-none
+                        placeholder:text-[#453B2C] placeholder:italic placeholder:font-medium font-inter"
+                            rows={6}
+                        />
+                    </div>
+                </div>
+            </>
+        );
+    };
+
+    const step_9_content = () => {
+        return (
+            <>
+                <h1 className="w-full lg:px-20 px-4 text-center text-[32px] text-[#453B2C] font-[400] mb-8 leading-tight font-gloock flex items-center justify-center flex-wrap">
+                    Session Structure
+                </h1>
+                <div className="flex flex-col gap-y-4 lg:px-28">
+                    <div className="flex flex-col md:flex-row gap-4">
+                        <div className="flex flex-col w-full">
+                            <label htmlFor="session_length_minutes" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-1">Typical session length</label>
+                            <input
+                                type="text"
+                                name="session_length_minutes"
+                                placeholder="In minutes"
+                                value={formData.session_length_minutes}
+                                onChange={handleChange}
+                                className="w-full h-12 rounded-2xl px-4 bg-[#FFF9F1] text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-md"
+                            />
+                        </div>
+
+                        <div className="flex flex-col w-full">
+                            <label htmlFor="recommended_frequency" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-1">Recommended session frequency</label>
+                            <input
+                                type="text"
+                                name="recommended_frequency"
+                                placeholder={`e.g., "two times a week"`}
+                                value={formData.recommended_frequency}
+                                onChange={handleChange}
+                                className="w-full h-12 rounded-2xl px-4 bg-[#FFF9F1] text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-md"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <h1 className="w-full lg:px-20 px-4 text-center text-[32px] text-[#453B2C] font-[400] my-8 leading-tight font-gloock flex items-center justify-center flex-wrap">
+                    Pricing Tier
+                </h1>
+                <div className="flex flex-col gap-y-4 lg:px-56">
+                    <div className="flex flex-col w-full">
+                        {[
+                            "Premium tier ($500+)",
+                            "Advanced tier ($300-$499)",
+                            "Standard tier ($200-$299)",
+                            "Introductory tier (under $200)"].map((item) =>
+                                <label
+                                    className="flex items-center space-x-4 mb-4 cursor-pointer text-[#453B2C] font-[500] font-inter text-[18px]"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        name="pricing_tier"
+                                        checked={formData.pricing_tier == item}
+                                        onChange={handleChange}
+                                        className="hidden"
+                                    />
+
+                                    {/* Estilo do radio button customizado */}
+                                    <div className="w-6 h-6 flex items-center justify-center">
+                                        <div
+                                            className={`w-6 h-6 rounded-2xl border-[2px] border-[#453B2C] flex items-center justify-center`}
+                                        >
+                                            <div
+                                                className={`w-3.5 h-3.5 rounded-2xl ${formData.pricing_tier == item
+                                                    ? "bg-[#453B2C]"
+                                                    : "bg-transparent"
+                                                    }`}
+                                            />
+                                        </div>
+                                    </div>
+                                    <span className="font-[700]">{item}</span>
+                                </label>
+                            )}
+                    </div>
+                </div>
+            </>
+        );
+    };
+
+    const step_10_content = () => {
+        return (
+            <>
+                <h1 className="w-full lg:px-20 px-4 text-center text-[32px] text-[#453B2C] font-[400] mb-4 leading-tight font-gloock flex items-center justify-center flex-wrap">
+                    Languages
+                </h1>
+                <div className="flex flex-col gap-y-4 lg:px-48">
+                    <label htmlFor="additional_differentiator_1" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-4 text-center">Please indicate all languages in which you are proficient enough to conduct full therapeutic sessions:</label>
+                    <div className={`${languages.length > 10 && !isMobile ? "grid grid-cols-2 gap-x-12" : "flex flex-col w-full"
+                        }`}>
+                        {languages.map((lang) => (
+                            <div key={lang.id} className="flex items-center space-x-2 my-1">
+                                <label
+                                    key={lang.id}
+                                    className="flex items-center space-x-4 cursor-pointer text-[#453B2C] font-[500] font-inter text-[18px]"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        value={lang.id}
+                                        checked={formData.language_ids.includes(lang.id)}
+                                        onChange={(e) =>
+                                            handleMultiSelect(e, "language_ids")
+                                        }
+                                        className="hidden"
+                                    />
+
+                                    {/* Estilo do radio button customizado */}
+                                    <div className="w-6 h-6 flex items-center justify-center">
+                                        <div
+                                            className={`w-6 h-6 rounded-2xl border-[2px] border-[#453B2C] flex items-center justify-center`}
+                                        >
+                                            <div
+                                                className={`w-3.5 h-3.5 rounded-2xl ${formData.language_ids.includes(lang.id)
+                                                    ? "bg-[#453B2C]"
+                                                    : "bg-transparent"
+                                                    }`}
+                                            />
+                                        </div>
+                                    </div>
+                                    <span className="font-[700]">{lang.name}</span>
+                                </label>
+                            </div>
+                        ))}
+                    </div>
+                    {/* Campo para digitar o "Other" */}
+                    {otherIds.language && formData.language_ids.includes(otherIds.language) && (
+                        <div className="flex flex-col w-full">
+                            <textarea
+                                name="language_other"
+                                placeholder="(Please specify):"
+                                value={formData.language_other}
+                                onChange={handleChange}
+                                className="w-full p-4 mt-4 rounded-2xl bg-white shadow-md text-[14px] font-inter
+                        focus:outline-none focus:ring-2 focus:ring-yellow-400 block resize-none
+                        placeholder:text-[#453B2C] placeholder:italic placeholder:font-medium font-inter"
+                                rows={10}
+                            />
+                        </div>
+                    )}
+                </div>
+            </>
+        );
+    };
+
+    const step_11_content = () => {
+        return (
+            <>
+                <h1 className="w-full lg:px-20 px-4 text-center text-[32px] text-[#453B2C] font-[400] mb-4 leading-tight font-gloock flex items-center justify-center flex-wrap">
+                    Additional Information
+                </h1>
+                <div className="flex flex-col gap-y-4 lg:px-48">
+                    <label htmlFor="additional_differentiator_1" className="text-[14px] font-[500] font-inter text-[#453B2C] mb-4 text-center">Is there anything else you'd like potential clients to know about your practice?</label>
+                    <div className="flex flex-col w-full">
+                        <textarea
+                            name="additional_information"
+                            value={formData.additional_information}
+                            onChange={handleChange}
+                            className="w-full p-4 mt-4 rounded-2xl bg-white shadow-md text-[14px] font-inter
+                        focus:outline-none focus:ring-2 focus:ring-yellow-400 block resize-none
+                        placeholder:text-[#453B2C] placeholder:italic placeholder:font-medium font-inter"
+                            rows={10}
+                        />
+                    </div>
+                </div>
+            </>
+        );
     };
 
     return (
-        <div className="min-h-screen w-full bg-cover bg-center bg-no-repeat fixed"
-            style={{ backgroundImage: `url(/app/therapist-form-bg.jpg)` }}>
-            {/* Logo no topo esquerdo */}
-            <img src="/app/glow-logo-orange.png" alt="Glow Logo" className="w-[590px] absolute top-0 left-0" />
+        <div
+            className="min-h-screen bg-cover bg-center px-4 pt-6 pb-12"
+            style={{ backgroundImage: `url(${currentBackground})` }}>
+            {/* Barra translúcida com fundo */}
+            <div className="flex flex-col gap-6 max-w-4xl mx-auto lg:mt-8 mt-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="97" height="34" viewBox="0 0 97 34" fill="none">
+                    <path d="M12.335 26.6895C10.5443 26.6895 8.88862 26.3696 7.36891 25.7307C5.8492 25.0917 4.54731 24.2079 3.46325 23.0809C2.37919 21.9538 1.53069 20.6052 0.91858 19.0358C0.305631 17.4655 0 15.7395 0 13.8569C0 11.9743 0.305631 10.2475 0.91858 8.67811C1.53069 7.10872 2.37919 5.76091 3.46325 4.63301C4.54647 3.50595 5.8492 2.62213 7.36891 1.98321C8.88862 1.34429 10.5434 1.02441 12.335 1.02441C13.7247 1.02441 15.0088 1.21101 16.1874 1.58253C17.3652 1.95489 18.4079 2.44303 19.3155 3.04696C20.2223 3.65173 20.988 4.3373 21.6128 5.1045C22.2367 5.8717 22.691 6.66223 22.9738 7.47608C23.1621 7.96422 23.2212 8.41738 23.1503 8.83638C23.0793 9.25539 22.9257 9.61525 22.691 9.91763C22.4554 10.22 22.1607 10.4583 21.8078 10.6324C21.4541 10.8065 21.0775 10.8939 20.6765 10.8939C20.1345 10.8939 19.6043 10.7082 19.0859 10.3358C18.5675 9.96428 18.1546 9.37118 17.849 8.55732C17.1651 6.67389 16.1756 5.18697 14.8805 4.09406C13.5845 3.00115 12.1703 2.45469 10.6397 2.45469C9.69659 2.45469 8.87257 2.71043 8.16591 3.22189C7.45924 3.73336 6.87584 4.39644 6.41655 5.20946C5.95726 6.02331 5.61533 6.94129 5.39159 7.96422C5.16701 8.98716 5.05557 10.0218 5.05557 11.068C5.05557 12.37 5.29112 13.7178 5.76223 15.1131C6.23334 16.5076 6.90455 17.7871 7.77669 18.9491C8.64799 20.112 9.70251 21.065 10.9402 21.8089C12.1771 22.5536 13.5735 22.9251 15.1287 22.9251C16.3301 22.9251 17.2259 22.5477 17.8152 21.7914C18.4037 21.0366 18.6983 20.077 18.6983 18.9141V18.2169C18.6983 18.0078 18.6865 17.7987 18.6629 17.5888L18.6983 18.356C18.6511 17.4031 18.4687 16.5834 18.1504 15.8978C17.8321 15.2122 17.296 14.869 16.542 14.869C16.0473 14.869 15.5703 14.974 15.111 15.1831C14.6517 15.3922 14.2101 15.6312 13.7855 15.8978C13.3616 16.1652 12.9488 16.4034 12.5486 16.6125C12.1475 16.8216 11.7355 16.9266 11.3117 16.9266C10.6515 16.9266 10.0799 16.735 9.59781 16.351C9.11488 15.9678 8.86075 15.4388 8.83796 14.7641C8.81432 14.1602 9.0676 13.5962 9.59781 13.0731C10.128 12.5499 10.8288 12.2884 11.7009 12.2884C12.2894 12.2884 12.7436 12.3409 13.0619 12.445C13.3802 12.5491 13.739 12.6666 14.1401 12.794C14.5402 12.9223 15.0705 13.0381 15.7307 13.143C16.3901 13.248 17.3441 13.2997 18.5937 13.2997H22.0569C23.0228 13.2997 23.6475 13.4912 23.9304 13.8753C24.2132 14.2593 24.3542 14.8466 24.3542 15.6362V25.644C24.3542 26.3413 24.2005 26.6903 23.8949 26.6903C23.7767 26.6903 23.6475 26.597 23.5065 26.4112C23.3411 26.1788 23.1528 25.9231 22.9409 25.644C22.729 25.365 22.4934 25.1034 22.2342 24.8593C21.975 24.6153 21.6863 24.412 21.368 24.2496C21.0497 24.0871 20.69 24.0055 20.2898 24.0055C19.8896 24.0055 19.4472 24.1454 18.9643 24.4237C18.4814 24.7027 17.9216 25.0109 17.2859 25.3475C16.6493 25.6848 15.9308 25.9922 15.1296 26.2713C14.3283 26.5503 13.3979 26.6895 12.3375 26.6895H12.335Z" fill="#FF9900" />
+                    <path d="M26.2936 25.33C26.6237 24.7952 26.8821 24.1963 27.0712 23.534C27.2595 22.8718 27.4005 22.2262 27.495 21.599C27.5887 20.9709 27.6478 20.3903 27.6715 19.8555C27.6943 19.3207 27.7069 18.9375 27.7069 18.7051V8.8714C27.7069 8.61566 27.6951 8.22665 27.6715 7.70352C27.6478 7.18039 27.5887 6.60478 27.495 5.97752C27.4005 5.34943 27.2595 4.69885 27.0712 4.02494C26.8821 3.35104 26.6237 2.75794 26.2936 2.24647C26.1526 2.03738 26.0513 1.88661 25.9931 1.79331C25.934 1.70085 26.0336 1.63087 26.2936 1.58423L32.7262 0.0140012C32.9145 -0.0326473 33.009 0.0373255 33.009 0.223087V18.7051C33.009 19.2399 33.0268 19.7688 33.0622 20.292C33.0977 20.8151 33.1619 21.3324 33.2564 21.8439C33.5393 23.1925 34.0982 24.4362 34.9349 25.5749C35.7707 26.7136 36.7551 27.7024 37.8865 28.5388C39.0178 29.3759 40.2133 30.0265 41.4738 30.4913C42.7344 30.9562 43.9299 31.1886 45.0612 31.1886C46.3099 31.1886 47.323 30.9903 48.1006 30.5955C48.8782 30.1998 49.5671 29.7641 50.1683 29.2876C50.7694 28.8112 51.3342 28.3747 51.8644 27.9798C52.3946 27.5841 53.0245 27.3867 53.7556 27.3867C54.4868 27.3867 55.0575 27.5958 55.5404 28.0148C56.0234 28.433 56.2412 29.0028 56.1948 29.7233C56.1711 30.3514 55.9415 30.9028 55.5058 31.3793C55.0693 31.8558 54.5037 32.2565 53.8097 32.5822C53.114 32.9071 52.3127 33.152 51.406 33.3144C50.4984 33.4768 49.5502 33.5585 48.5607 33.5585C46.6755 33.5585 45.0316 33.3719 43.6301 33.0004C42.2278 32.628 40.9968 32.1632 39.9364 31.6059C38.876 31.0478 37.9338 30.438 37.1089 29.775C36.284 29.1127 35.5005 28.5021 34.7584 27.944C34.0163 27.3859 33.2742 26.9211 32.532 26.5495C31.7899 26.1772 30.9473 25.9914 30.0051 25.9914H26.2936C26.0344 25.9914 25.934 25.9339 25.9931 25.8173C26.0513 25.7015 26.1518 25.5383 26.2936 25.3292V25.33Z" fill="#FF9900" />
+                    <path d="M36.3672 17.1355C36.3672 15.7411 36.6205 14.4566 37.127 13.282C37.6336 12.1083 38.3344 11.097 39.2302 10.2482C40.1251 9.40018 41.1796 8.7371 42.3937 8.26062C43.6069 7.78414 44.9324 7.5459 46.3694 7.5459C47.8064 7.5459 49.1319 7.78414 50.3451 8.26062C51.5584 8.7371 52.607 9.40018 53.4909 10.2482C54.3749 11.097 55.0689 12.1083 55.5763 13.282C56.0829 14.4566 56.3362 15.7402 56.3362 17.1355C56.3362 18.5308 56.0829 19.8153 55.5763 20.989C55.0698 22.1636 54.3749 23.1682 53.4909 24.0053C52.607 24.8425 51.5584 25.4998 50.3451 25.9754C49.1311 26.4519 47.8055 26.6901 46.3694 26.6901C44.9333 26.6901 43.6069 26.4511 42.3937 25.9754C41.1796 25.4989 40.1259 24.8417 39.2302 24.0053C38.3344 23.1682 37.6336 22.1636 37.127 20.989C36.6205 19.8153 36.3672 18.5308 36.3672 17.1355ZM41.492 15.043C41.492 15.9493 41.5984 17.0131 41.8103 18.2334C42.0222 19.4538 42.3582 20.6108 42.8175 21.7029C43.2768 22.7958 43.8661 23.7196 44.5846 24.4752C45.3031 25.2307 46.1693 25.6089 47.1825 25.6089C48.0774 25.6089 48.7908 25.4115 49.321 25.0158C49.8512 24.6209 50.2573 24.1153 50.5402 23.4989C50.823 22.8833 51.0113 22.1969 51.1058 21.4413C51.1996 20.6858 51.2468 19.9478 51.2468 19.2272C51.2468 18.2742 51.1345 17.1822 50.9108 15.9493C50.6862 14.7173 50.3392 13.5602 49.8681 12.4798C49.3962 11.3986 48.7959 10.4864 48.0656 9.74255C47.3353 8.99867 46.4749 8.62631 45.4854 8.62631C44.5897 8.62631 43.8771 8.81791 43.3469 9.20192C42.8167 9.58594 42.4156 10.0799 42.1455 10.6838C41.8744 11.2886 41.698 11.9742 41.6153 12.7414C41.5325 13.5086 41.492 14.2758 41.492 15.043ZM43.9303 16.8565C44.2359 16.6474 44.6251 16.3108 45.0962 15.8452C45.5673 15.3795 45.9802 14.8106 46.3331 14.1367C46.4505 13.8576 46.5687 13.8576 46.6869 14.1367C47.0406 14.8114 47.4585 15.3804 47.9415 15.8452C48.4244 16.3108 48.8077 16.6474 49.0897 16.8565C49.278 17.043 49.2661 17.2171 49.0542 17.3796C48.7714 17.5887 48.394 17.9144 47.9229 18.3559C47.4509 18.7974 47.0398 19.3555 46.686 20.0294C46.5678 20.3084 46.4505 20.3084 46.3323 20.0294C45.9785 19.3555 45.5665 18.7974 45.0954 18.3559C44.6234 17.9144 44.2469 17.5887 43.964 17.3796C43.7521 17.2171 43.7395 17.043 43.9286 16.8565H43.9303Z" fill="#FF9900" />
+                    <path d="M56.9715 8.55895H64.7474C64.9357 8.55895 65.0184 8.59394 64.9948 8.66391C64.9711 8.73388 64.9002 8.82718 64.7828 8.94297C64.3818 9.31532 64.1994 9.87927 64.2349 10.634C64.2704 11.3895 64.5473 12.4299 65.0657 13.7553L67.7513 20.7642C67.8687 21.0899 67.9633 21.3398 68.0342 21.5139C68.1051 21.688 68.1634 21.8396 68.2106 21.9671C68.2579 22.0954 68.3043 22.2112 68.3516 22.3161C68.3989 22.4211 68.458 22.566 68.5281 22.7518C68.7636 22.1712 69.0051 21.5664 69.2525 20.9383C69.4999 20.3102 69.7413 19.6946 69.9769 19.0899C70.2597 18.416 70.5425 17.7187 70.8254 16.9973C71.1082 16.2768 71.4029 15.5446 71.7093 14.8007L71.321 13.7544C71.2501 13.5687 71.1319 13.2721 70.9672 12.8648C70.8017 12.4583 70.5957 12.0101 70.3484 11.522C70.101 11.0338 69.8122 10.5632 69.4821 10.11C69.152 9.65686 68.7983 9.30283 68.4217 9.04626C68.0207 8.72139 67.9742 8.55812 68.2807 8.55812H76.0566C76.2448 8.55812 76.3276 8.5931 76.3039 8.66308C76.2803 8.73305 76.2094 8.82635 76.092 8.94214C75.691 9.31449 75.5086 9.87844 75.5441 10.6331C75.5795 11.3887 75.8565 12.4291 76.3749 13.7544L79.0605 20.7634C79.1779 21.0658 79.2724 21.3098 79.3434 21.4956C79.4143 21.6822 79.4725 21.833 79.5198 21.9488C79.5671 22.0654 79.6085 22.1753 79.6431 22.2803C79.6777 22.3853 79.7317 22.5194 79.8018 22.681C80.2493 21.5647 80.6967 20.4435 81.1451 19.3156C81.5925 18.1886 82.0045 17.1365 82.3819 16.1602C82.7585 15.1839 83.1004 14.3067 83.4069 13.527C83.7125 12.7482 83.9489 12.1492 84.1136 11.7311C84.6083 10.4532 85.1681 9.2087 85.792 8C86.4159 6.7913 87.1175 5.71589 87.8951 4.77458C88.6727 3.83328 89.5322 3.07191 90.4752 2.49047C91.4175 1.90986 92.4542 1.61914 93.5856 1.61914C94.7169 1.61914 95.5882 1.88654 96.1302 2.42133C96.6723 2.95612 96.961 3.54339 96.9965 4.18231C97.0319 4.82207 96.8251 5.40851 96.3776 5.9433C95.9301 6.47809 95.2936 6.74549 94.4695 6.74549C94.0921 6.74549 93.7806 6.71633 93.5332 6.65802C93.2859 6.60054 93.0562 6.54223 92.8443 6.48392C92.6324 6.42644 92.4137 6.36813 92.1908 6.30982C91.9662 6.25234 91.6902 6.22236 91.36 6.22236C90.0877 6.22236 88.8559 6.91459 87.6663 8.29738C86.4759 9.68102 85.3631 11.6394 84.3263 14.1734C84.0198 14.9406 83.7252 15.6845 83.4424 16.4051C83.1595 17.1256 82.8471 17.9103 82.506 18.7592C82.1641 19.608 81.7816 20.561 81.357 21.6189C80.9331 22.6768 80.4384 23.9147 79.8727 25.3324L79.6608 25.8206C79.6372 25.9139 79.5544 25.9597 79.4134 25.9597H76.1266C75.9856 25.9597 75.8911 25.9022 75.8438 25.7856C75.6547 25.2975 75.5019 24.8793 75.3845 24.5303C75.2663 24.1812 75.1422 23.833 75.013 23.484C74.883 23.135 74.742 22.7518 74.5892 22.3336C74.4355 21.9154 74.2414 21.3923 74.0058 20.7642L72.2742 16.231L68.3508 25.8206C68.3271 25.9139 68.2444 25.9597 68.1034 25.9597H64.8166C64.6756 25.9597 64.5811 25.9022 64.5338 25.7856C64.3447 25.2975 64.1918 24.8793 64.0745 24.5303C63.9563 24.1812 63.833 23.833 63.703 23.484C63.573 23.135 63.432 22.7518 63.2792 22.3336C63.1255 21.9154 62.9313 21.3923 62.6958 20.7642L60.0093 13.7553C59.9383 13.5695 59.8201 13.273 59.6555 12.8656C59.49 12.4591 59.284 12.0109 59.0367 11.5228C58.7893 11.0347 58.5005 10.564 58.1704 10.1108C57.8403 9.65769 57.4865 9.30366 57.11 9.04709C56.709 8.72222 56.6625 8.55895 56.969 8.55895H56.9715Z" fill="#FF9900" />
+                </svg>
+                <div className="w-full min-h-[68px] rounded-[19px] bg-white/30 flex flex-col items-center px-4">
+                    <div className="w-full text-[#453B2C] font-inter text-[12px] font-[400] mt-2">
+                        {`Step ${currentStep}. - Therapist Profile Questionnaire`}
+                    </div>
+                    <div className="min-h-[9px] w-full rounded-[30px] mt-4 mb-2 relative" style={{
+                        background: "rgba(139, 139, 139, 0.06)",
+                    }}>
+                        <div className="absolute top-[-8px] left-0 h-[30px] rounded-2xl bg-white flex items-center justify-center"
+                            style={{
+                                width: `${progressPercent >= 100 ? 100 : progressPercent - 5}%`
+                            }}>
+                            <span className="text-[#453B2C80] font-inter font-bold text-sm pr-3 w-full text-right">
+                                {currentStep} / {TOTAL_STEPS}
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
-            {/* Card central */}
-            <div className="min-h-screen flex justify-center items-center p-6 rounded-2xl shadow-2xl">
-                <div className="w-full max-w h-[80vh] overflow-y-auto scroll-visible rounded-2xl shadow-2xl">
+                {/* Container com fundo embaçado (duas camadas atrás do conteúdo) */}
+                <div className="relative w-full max-w-4xl mt-4 rounded-[18px]">
+                    {/* Camada de blur 1 */}
+                    <div className="absolute inset-0 rounded-[18px] z-0" style={{ filter: "blur(5px)", background: "rgba(248, 245, 245, 0.30)" }} />
+                    {/* Camada de blur 2 */}
+                    <div className="absolute inset-0 rounded-[18px] backdrop-blur-[15px] z-0" style={{ background: "rgba(248, 245, 245, 0.10)" }} />
+
+                    {/* Conteúdo principal */}
                     <form
                         onSubmit={handleSubmit}
-                        className="h-full flex flex-col space-y-4 rounded-2xl shadow-2xl">
-                        {currentStep == 1 && (
-                            <div id="step1" className="mx-auto w-full h-auto rounded-2xl shadow-2xl px-14 py-16 text-left z-10 bg-[#F8F5F5]">
-                                <h1 className="text-[32px] font-[400] font-gloock text-[#202020] mb-6">Glow Therapist Profile Questionnaire</h1>
-                                <h2 className="text-[20px] font-[400] font-gloock text-[#453B2C] mb-16">Thank you for your interest in joining Glow's exclusive network of therapeutic<br />professionals. Please complete the following information to create your profile.
-                                </h2>
-                                <div className="w-3/5">
-                                    <div className="border-t-[4px] border-[#888888]-300 mb-6">
-                                        <h2 className="text-[20px] font-[400] font-gloock text-[#453B2C] inline-block">
-                                            Basic Information
-                                        </h2>
-                                    </div>
-                                    <div className="flex flex-col space-y-1 w-1/2">
-                                        <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                            Full Name*:
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="full_name"
-                                            value={formData.full_name}
-                                            onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
-                                            required
+                        className="w-full h-full">
+                        <div className="relative z-10 px-6 py-10">
+                            {{
+                                1: step_1_content(),
+                                2: step_2_content(),
+                                3: step_3_content(),
+                                4: step_4_content(),
+                                5: step_5_content(),
+                                6: step_6_content(),
+                                7: step_7_content(),
+                                8: step_8_content(),
+                                9: step_9_content(),
+                                10: step_10_content(),
+                                11: step_11_content()
+                            }[currentStep]}
+                        </div>
+                        {/* Botões navegação */}
+                        <div className="flex justify-center gap-6 mb-12">
+                            {/* Botão Back */}
+                            <button
+                                type="button"
+                                className="relative w-[153px] h-[80px] flex items-center justify-center"
+                                onClick={handleBack}
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="153"
+                                    height="80"
+                                    viewBox="0 0 153 80"
+                                    fill="none"
+                                    className="absolute top-0 left-0 z-0"
+                                >
+                                    <g filter="url(#filter0_d)">
+                                        <rect
+                                            x="10"
+                                            y="9"
+                                            width="133"
+                                            height="60"
+                                            rx="20"
+                                            fill="white"
+                                            fillOpacity="0.3"
                                         />
-                                    </div>
-                                    <div className="flex flex-col space-y-1 w-1/2 mt-4">
-                                        <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                            Professional Title:
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="professional_title"
-                                            value={formData.professional_title}
-                                            onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col space-y-1 w-1/2 mt-4">
-                                        <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                            Gender (for client matching purposes):
-                                        </label>
-                                        <select
-                                            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-[14px] font-[400] font-inter text-[#453B2C] appearance-none"
-                                            name="gender"
+                                    </g>
+                                    <defs>
+                                        <filter
+                                            id="filter0_d"
+                                            x="0"
+                                            y="0"
+                                            width="153"
+                                            height="80"
+                                            filterUnits="userSpaceOnUse"
+                                            colorInterpolationFilters="sRGB"
                                         >
-                                            <option value="male">Male</option>
-                                            <option value="female">Female</option>
-                                        </select>
-                                    </div>
-                                    <div className="flex flex-col space-y-1 w-1/2 mt-4">
-                                        <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                            Contact Email*:
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="contact_email"
-                                            value={formData.contact_email}
-                                            onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="flex flex-col space-y-1 w-1/2 mt-4">
-                                        <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                            Professional Website
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="professional_website"
-                                            value={formData.professional_website}
-                                            onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
-                                        />
-                                    </div>
-                                    <div className="border-t-[4px] border-[#888888]-300 mb-6 mt-20">
-                                        <h2 className="text-[20px] font-[400] font-gloock text-[#453B2C] inline-block">
-                                            Professional Experience
-                                        </h2>
-                                    </div>
-                                    <div className="flex flex-col space-y-1 w-1/2 mt-4">
-                                        <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                            Years of professional practice experience:
-                                        </label>
-                                        <input
-                                            type="number"
-                                            name="years_experience"
-                                            value={formData.years_experience}
-                                            onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col space-y-1 w-1/2 mt-4">
-                                        <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                            Educational background (degrees, certifications, specialized training):
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="education_background"
-                                            value={formData.education_background}
-                                            onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
-                                        />
-                                    </div>
-                                    <div className="border-t-[4px] border-[#888888]-300 mb-6 mt-20">
-                                        <h2 className="text-[20px] font-[400] font-gloock text-[#453B2C] inline-block">
-                                            Professional Bio
-                                        </h2>
-                                    </div>
-                                    <div className="flex flex-col space-y-1 w-1/2 mt-4">
-                                        <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                            Please provide a concise professional bio (100-150 words) highlighting your approach, philosophy, and what makes your practice unique. This will be displayed to potential clients.
-                                        </label>
-                                        <textarea
-                                            name="professional_bio"
-                                            value={formData.professional_bio}
-                                            onChange={handleChange}
-                                            className="w-full p-2 border border-gray-300 rounded-md bg-white shadow-md text-sm
-                        focus:outline-none focus:ring-2 focus:ring-yellow-400 block resize-none
-                        placeholder:text-black placeholder:italic placeholder:font-medium font-inter"
-                                            rows={3}
-                                        />
-                                    </div>
-                                    <div className="border-t-[4px] border-[#888888]-300 mb-6 mt-20">
-                                        <h2 className="text-[20px] font-[400] font-gloock text-[#453B2C] inline-block">
-                                            Primary Focus
-                                        </h2>
-                                    </div>
-                                    <div className="flex flex-col space-y-3">
-                                        {anamnesisCategories.map((cat) => (
-                                            <div key={cat.id} className="flex items-center space-x-2">
-                                                <input
-                                                    type="checkbox"
-                                                    value={cat.id}
-                                                    className="h-4 w-4 text-yellow-500 focus:ring-yellow-400"
-                                                    checked={formData.anamnesis_category_ids.includes(cat.id)}
-                                                    onChange={(e) =>
-                                                        handleMultiSelect(e, "anamnesis_category_ids")
-                                                    }
-                                                />
-                                                <label htmlFor="therapeutic_support" className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                    <span className="font-[700]">{cat.name}</span>
-                                                    <span className="font-[400]"> ({cat.subtitle})</span>
-                                                </label>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div className="border-t-[4px] border-[#888888]-300 mb-6 mt-20">
-                                        <h2 className="text-[20px] font-[400] font-gloock text-[#453B2C] inline-block">
-                                            Visual Assets
-                                        </h2>
-                                    </div>
-                                    <div className="flex flex-col space-y-6">
-                                        {/* Upload Photo */}
-                                        <div className="flex flex-col space-y-2 w-1/2 mt-4">
-                                            <label className="block text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                Professional Headshot: Please upload a high-resolution professional photo (guidelines: well-lit, neutral background, professional attire)
-                                            </label>
-
-                                            <input
-                                                type="file"
-                                                id="profile_picture"
-                                                accept="image/*"
-                                                className="hidden"
-                                                onChange={(e) => {
-                                                    if (e.target.files && e.target.files[0]) {
-                                                        setFormData((prev) => ({
-                                                            ...prev,
-                                                            profile_picture: e.target.files[0],
-                                                        }));
-                                                    }
-                                                }}
+                                            <feFlood floodOpacity="0" result="BackgroundImageFix" />
+                                            <feColorMatrix
+                                                in="SourceAlpha"
+                                                type="matrix"
+                                                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                                                result="hardAlpha"
                                             />
-
-                                            <label
-                                                htmlFor="profile_picture"
-                                                className="bg-white border border-gray-300 text-[#453B2C] font-bold font-inter text-[14px] px-6 py-2 rounded-md hover:bg-gray-50 transition text-center cursor-pointer"
-                                            >
-                                                {formData.profile_picture ? formData.profile_picture.name : "UPLOAD PHOTO"}
-                                            </label>
-                                        </div>
-
-                                        {/* Upload Video */}
-                                        <div className="flex flex-col space-y-2 w-1/2 mt-4">
-                                            <label className="block text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                Introduction Video: Please upload a 30-60 second video introducing yourself and briefly explaining your approach to therapy/coaching (guidelines: good lighting, clear audio, professional setting)
-                                            </label>
-
-                                            <input
-                                                type="file"
-                                                id="intro_video"
-                                                accept="video/*"
-                                                className="hidden"
-                                                onChange={(e) => {
-                                                    if (e.target.files && e.target.files[0]) {
-                                                        setFormData((prev) => ({
-                                                            ...prev,
-                                                            intro_video: e.target.files[0],
-                                                        }));
-                                                    }
-                                                }}
+                                            <feOffset dy="1" />
+                                            <feGaussianBlur stdDeviation="5" />
+                                            <feComposite in2="hardAlpha" operator="out" />
+                                            <feColorMatrix
+                                                type="matrix"
+                                                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.01 0"
                                             />
-
-                                            <label
-                                                htmlFor="intro_video"
-                                                className="bg-white border border-gray-300 text-[#453B2C] font-bold font-inter text-[14px] px-6 py-2 rounded-md hover:bg-gray-50 transition text-center cursor-pointer"
-                                            >
-                                                {formData.intro_video ? formData.intro_video.name : "UPLOAD VIDEO"}
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* Novo wrapper só pro botão */}
-                                <div className="w-full flex justify-center mt-16">
-                                    <button
-                                        onClick={handleNextStep}
-                                        className="bg-[#EB970C] text-white text-[16px] font-[700] font-inter py-4 px-12 rounded-3xl shadow-lg w-full max-w-md lg:text-[20px] lg:px-14 lg:py-5"
-                                    >
-                                        Next
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                        {currentStep == 2 && (
-                            <div id="step2" className="mx-auto w-full h-auto rounded-2xl shadow-2xl px-14 py-16 text-left z-10 bg-[#F8F5F5]">
-                                <div className="flex flex-col items-start w-full">
-                                    <h1 className="text-[32px] font-[400] font-gloock text-[#202020] mb-6">
-                                        Key Differentiators (IMPORTANT)
-                                    </h1>
-                                    <h2 className="text-[20px] font-[400] font-gloock text-[#453B2C] mb-16">
-                                        This section is critical for matching you with compatible clients.<br />
-                                        Please provide at least 5 specific, concise differentiators that make your practice unique<br />
-                                        (the more you can provide, the better we can match you with ideal clients):
-                                    </h2>
-                                    <div className="w-3/5">
-                                        <div className="border-t-[4px] border-[#888888]-300 mb-6">
-                                            <h2 className="text-[20px] font-[400] font-gloock text-[#453B2C] inline-block">
-                                                Specific Differentiators
-                                            </h2>
-                                        </div>
-                                        <div className="flex flex-col space-y-1 w-1/2">
-                                            <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                Specialized skill/expertise (e.g., "Specialized in executive burnout"):
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="specialized_skill_expertise"
-                                                value={formData.specialized_skill_expertise}
-                                                onChange={handleChange}
-                                                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
+                                            <feBlend
+                                                mode="normal"
+                                                in2="BackgroundImageFix"
+                                                result="effect1_dropShadow"
                                             />
-                                        </div>
-                                        <div className="flex flex-col space-y-1 w-1/2 mt-4">
-                                            <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                Unique therapeutic approach (e.g., "EMDR trauma resolution expert"):
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="unique_therapeutic_approach"
-                                                value={formData.unique_therapeutic_approach}
-                                                onChange={handleChange}
-                                                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
+                                            <feBlend
+                                                mode="normal"
+                                                in="SourceGraphic"
+                                                in2="effect1_dropShadow"
+                                                result="shape"
                                             />
-                                        </div>
-                                        <div className="flex flex-col space-y-1 w-1/2 mt-4">
-                                            <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                Demographic specialty (e.g., "Specialized in teenagers"):
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="demographic_specialty"
-                                                value={formData.demographic_specialty}
-                                                onChange={handleChange}
-                                                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
-                                            />
-                                        </div>
-                                        <div className="flex flex-col space-y-1 w-1/2 mt-4">
-                                            <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                Outcome expertise (e.g., "Rapid anxiety reduction techniques"):
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="outcome_expertise"
-                                                value={formData.outcome_expertise}
-                                                onChange={handleChange}
-                                                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
-                                            />
-                                        </div>
-                                        <div className="flex flex-col space-y-1 w-1/2 mt-4">
-                                            <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                Unique background/perspective (e.g., "Former CEO, understands executive pressure"):
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="unique_background_perspective"
-                                                value={formData.unique_background_perspective}
-                                                onChange={handleChange}
-                                                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
-                                            />
-                                        </div>
-                                        <div className="flex flex-col space-y-1 w-1/2 mt-4">
-                                            <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                Additional differentiator:
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="additional_differentiator_1"
-                                                value={formData.additional_differentiator_1}
-                                                onChange={handleChange}
-                                                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
-                                            />
-                                        </div>
-                                        <div className="flex flex-col space-y-1 w-1/2 mt-4">
-                                            <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                Additional differentiator:
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="additional_differentiator_2"
-                                                value={formData.additional_differentiator_2}
-                                                onChange={handleChange}
-                                                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
-                                            />
-                                        </div>
-                                        <div className="flex flex-col space-y-1 w-1/2 mt-4">
-                                            <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                Additional differentiator:
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="additional_differentiator_3"
-                                                value={formData.additional_differentiator_3}
-                                                onChange={handleChange}
-                                                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
-                                            />
-                                        </div>
-                                        <div className="border-t-[4px] border-[#888888]-300 mb-6 mt-20">
-                                            <h2 className="text-[20px] font-[400] font-gloock text-[#453B2C] inline-block">
-                                                Specializations & Skills
-                                            </h2>
-                                        </div>
-                                        <div className="flex flex-col space-y-3">
-                                            <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                Please select all areas that apply to your practice. This is not exhaustive, so please add any additional specialties in the "Other" fields:
-                                            </label>
-                                            {specializations.map((spec) => (
-                                                <div key={spec.id} className="flex items-center space-x-2">
-                                                    <input
-                                                        type="checkbox"
-                                                        value={spec.id}
-                                                        className="h-4 w-4 text-yellow-500 focus:ring-yellow-400"
-                                                        checked={formData.specialization_ids.includes(spec.id)}
-                                                        onChange={(e) =>
-                                                            handleMultiSelect(e, "specialization_ids")
-                                                        }
-                                                    />
-                                                    <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                        <span className="font-[700]">{spec.name}</span>
-                                                    </label>
-                                                </div>
-                                            ))}
-                                            {/* Campo para digitar o "Other" */}
-                                            {otherIds.specialization && formData.specialization_ids.includes(otherIds.specialization) && (
-                                                <div className="flex flex-col space-y-3">
-                                                    <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                        (please specify any additional therapeutic methods you utilize):
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        name="specialization_other"
-                                                        value={formData.specialization_other}
-                                                        onChange={handleChange}
-                                                        className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="border-t-[4px] border-[#888888]-300 mb-6 mt-20">
-                                            <h2 className="text-[20px] font-[400] font-gloock text-[#453B2C] inline-block">
-                                                Specialized Demographics (select all that apply)
-                                            </h2>
-                                        </div>
-                                        <div className="flex flex-col space-y-3">
-                                            {demographics.map((demo) => (
-                                                <div key={demo.id} className="flex items-center space-x-2">
-                                                    <input
-                                                        type="checkbox"
-                                                        value={demo.id}
-                                                        className="h-4 w-4 text-yellow-500 focus:ring-yellow-400"
-                                                        checked={formData.specialized_demographic_ids.includes(demo.id)}
-                                                        onChange={(e) =>
-                                                            handleMultiSelect(e, "specialized_demographic_ids")
-                                                        }
-                                                    />
-                                                    <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                        <span className="font-[700]">{demo.name}</span>
-                                                    </label>
-                                                </div>
-                                            ))}
-                                            {/* Campo para digitar o "Other" */}
-                                            {otherIds.demographic && formData.specialized_demographic_ids.includes(otherIds.demographic) && (
-                                                <div className="flex flex-col space-y-3">
-                                                    <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                        (please specify any additional therapeutic methods you utilize):
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        name="specialized_demographic_other"
-                                                        value={formData.specialized_demographic_other}
-                                                        onChange={handleChange}
-                                                        className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="border-t-[4px] border-[#888888]-300 mb-6 mt-20">
-                                            <h2 className="text-[20px] font-[400] font-gloock text-[#453B2C] inline-block">
-                                                Session Information
-                                            </h2>
-                                        </div>
-                                        <div className="flex flex-col space-y-1 w-1/2">
-                                            <div className="flex items-center space-x-2">
-                                                <input
-                                                    type="checkbox"
-                                                    name="remote_sessions"
-                                                    checked={formData.remote_sessions}
-                                                    onChange={handleChange}
-                                                    className="h-4 w-4 text-yellow-500 focus:ring-yellow-400"
-                                                />
-                                                <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                    <span className="font-[700]">Remote sessions?</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col space-y-1 w-1/2">
-                                            <div className="flex items-center space-x-2">
-                                                <input
-                                                    type="checkbox"
-                                                    name="in_person_sessions"
-                                                    checked={formData.in_person_sessions}
-                                                    onChange={handleChange}
-                                                    className="h-4 w-4 text-yellow-500 focus:ring-yellow-400"
-                                                />
-                                                <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                    <span className="font-[700]">In-person sessions?</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        {/* Condicional: mostrar o campo detalhes se usar in_person_sessions */}
-                                        {formData.in_person_sessions && (
-                                            <div className="flex flex-col space-y-1 w-1/2 mt-4">
-                                                <label className="text-[14px] font-[700] font-inter text-[#453B2C]">
-                                                    Geographic location(s) for in-person sessions:
-                                                </label>
-                                                <textarea
-                                                    name="geographic_location"
-                                                    value={formData.geographic_location}
-                                                    onChange={handleChange}
-                                                    className="w-full p-2 border border-gray-300 rounded-md bg-white shadow-md text-sm
-                            focus:outline-none focus:ring-2 focus:ring-yellow-400 block resize-none
-                            placeholder:text-black placeholder:italic placeholder:font-medium font-inter"
-                                                    rows={3}
-                                                />
-                                            </div>
-                                        )}
-                                        <div className="border-t-[4px] border-[#888888]-300 mb-6 mt-20">
-                                            <h2 className="text-[20px] font-[400] font-gloock text-[#453B2C] inline-block">
-                                                Session Details
-                                            </h2>
-                                        </div>
-                                        <div className="flex flex-col space-y-1 w-1/2">
-                                            <div className="flex items-center space-x-2">
-                                                <input
-                                                    type="checkbox"
-                                                    name="hands_on_approach"
-                                                    checked={formData.hands_on_approach}
-                                                    onChange={handleChange}
-                                                    className="h-4 w-4 text-yellow-500 focus:ring-yellow-400"
-                                                />
-                                                <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                    <span className="font-[700]">Are your therapeutic approaches hands-on/include appropriate physical touch?</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col space-y-1 w-1/2">
-                                            <div className="flex items-center space-x-2">
-                                                <input
-                                                    type="checkbox"
-                                                    name="esoteric_frameworks"
-                                                    checked={formData.esoteric_frameworks}
-                                                    onChange={handleChange}
-                                                    className="h-4 w-4 text-yellow-500 focus:ring-yellow-400"
-                                                />
-                                                <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                    <span className="font-[700]">Do you incorporate esoteric or alternative frameworks?</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        {/* Condicional: mostrar o campo detalhes se usar esoteric_frameworks */}
-                                        {formData.esoteric_frameworks && (
-                                            <div className="flex flex-col space-y-1 w-1/2 mt-4">
-                                                <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                    If yes, please specify:
-                                                </label>
-                                                <textarea
-                                                    name="esoteric_frameworks_details"
-                                                    value={formData.esoteric_frameworks_details}
-                                                    onChange={handleChange}
-                                                    className="w-full p-2 border border-gray-300 rounded-md bg-white shadow-md text-sm
-                            focus:outline-none focus:ring-2 focus:ring-yellow-400 block resize-none
-                            placeholder:text-black placeholder:italic placeholder:font-medium font-inter"
-                                                    rows={3}
-                                                />
-                                            </div>
-                                        )}
-
-                                        <div className="border-t-[4px] border-[#888888]-300 mb-6 mt-20">
-                                            <h2 className="text-[20px] font-[400] font-gloock text-[#453B2C] inline-block">
-                                                Session Structure
-                                            </h2>
-                                        </div>
-                                        <div className="flex flex-col space-y-1 w-1/2">
-                                            <div className="flex flex-col space-y-3">
-                                                <label className="text-[14px] font-[700] font-inter text-[#453B2C]">
-                                                    Typical session length (in minutes):
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    name="session_length_minutes"
-                                                    value={formData.session_length_minutes}
-                                                    onChange={handleChange}
-                                                    className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col space-y-1 w-1/2 mt-4">
-                                            <div className="flex flex-col space-y-3">
-                                                <label className="text-[14px] font-[700] font-inter text-[#453B2C]">
-                                                    Recommended session frequency:
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    name="recommended_frequency"
-                                                    value={formData.recommended_frequency}
-                                                    onChange={handleChange}
-                                                    className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col space-y-1 w-1/2 mt-4">
-                                            <div className="flex flex-col space-y-3">
-                                                <label className="text-[14px] font-[700] font-inter text-[#453B2C]">
-                                                    Pricing tier (select one):
-                                                </label>
-                                                <select
-                                                    className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-[14px] font-[400] font-inter text-[#453B2C] appearance-none"
-                                                    name="pricing_tier"
-                                                >
-                                                    <option value="Premium ($500+)">Premium ($500+)</option>
-                                                    <option value="Advanced ($300-$499)">
-                                                        Advanced ($300-$499)
-                                                    </option>
-                                                    <option value="Standard ($200-$299)">
-                                                        Standard ($200-$299)
-                                                    </option>
-                                                    <option value="Introductory (under $200)">
-                                                        Introductory (under $200)
-                                                    </option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div className="border-t-[4px] border-[#888888]-300 mb-6 mt-20">
-                                            <h2 className="text-[20px] font-[400] font-gloock text-[#453B2C] inline-block">
-                                                Languages
-                                            </h2>
-                                        </div>
-                                        <div className="flex flex-col space-y-3">
-                                            <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                Please indicate all languages in which you are proficient enough to conduct full therapeutic sessions:
-                                            </label>
-                                            {languages.map((lang) => (
-                                                <div key={lang.id} className="flex items-center space-x-2">
-                                                    <input
-                                                        type="checkbox"
-                                                        value={lang.id}
-                                                        className="h-4 w-4 text-yellow-500 focus:ring-yellow-400"
-                                                        checked={formData.language_ids.includes(lang.id)}
-                                                        onChange={(e) =>
-                                                            handleMultiSelect(e, "language_ids")
-                                                        }
-                                                    />
-                                                    <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                        <span className="font-[700]">{lang.name}</span>
-                                                    </label>
-                                                </div>
-                                            ))}
-                                            {/* Campo para digitar o "Other" */}
-                                            {otherIds.language && formData.language_ids.includes(otherIds.language) && (
-                                                <div className="flex flex-col space-y-3">
-                                                    <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                        please specify:
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        name="language_other"
-                                                        value={formData.language_other}
-                                                        onChange={handleChange}
-                                                        className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white text-gray-800 text-sm"
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="border-t-[4px] border-[#888888]-300 mb-6 mt-20">
-                                            <h2 className="text-[20px] font-[400] font-gloock text-[#453B2C] inline-block">
-                                                Additional Information
-                                            </h2>
-                                        </div>
-                                        <div className="flex flex-col space-y-3">
-                                            <label className="text-[14px] font-[400] font-inter text-[#453B2C]">
-                                                Is there anything else you'd like potential clients to know about your practice?
-                                            </label>
-                                            <textarea
-                                                name="additional_information"
-                                                value={formData.additional_information}
-                                                onChange={handleChange}
-                                                className="w-full p-2 border border-gray-300 rounded-md bg-white shadow-md text-sm
-                            focus:outline-none focus:ring-2 focus:ring-yellow-400 block resize-none
-                            placeholder:text-black placeholder:italic placeholder:font-medium font-inter"
-                                                rows={3}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Novo wrapper só pro botão */}
-                                <div className="w-full flex justify-center mt-16 gap-8">
-                                    <button
-                                        onClick={() => setCurrentStep(1)}
-                                        className="bg-white text-black text-[16px] font-[700] font-inter py-4 px-12 rounded-3xl shadow-lg w-full max-w-md lg:text-[20px] lg:px-14 lg:py-5"
-                                    >
-                                        Back
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="bg-[#EB970C] text-white text-[16px] font-[700] font-inter py-4 px-12 rounded-3xl shadow-lg w-full max-w-md lg:text-[20px] lg:px-14 lg:py-5"
-                                    >
-                                        Complete
-                                    </button>
-                                </div>
-                            </div>)
-                        }
-                    </form >
-                </div >
-            </div >
-        </div >
+                                        </filter>
+                                    </defs>
+                                </svg>
+                                <span
+                                    className="relative z-10"
+                                    style={{
+                                        color: "#453B2C",
+                                        fontFamily: "Inter",
+                                        fontSize: "16px",
+                                        fontWeight: 400,
+                                        lineHeight: "35px",
+                                    }}
+                                >
+                                    Back
+                                </span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleNextStep}
+                                className="relative w-[133px] h-[60px] flex items-center justify-center"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="133"
+                                    height="60"
+                                    viewBox="0 0 133 60"
+                                    fill="none"
+                                    className="absolute top-0 left-0 z-0"
+                                >
+                                    <rect
+                                        width="133"
+                                        height="60"
+                                        rx="20"
+                                        fill="#EB970C"
+                                        fillOpacity="0.9"
+                                    />
+                                </svg>
+                                <span
+                                    className="relative z-10"
+                                    style={{
+                                        color: "#FFF",
+                                        fontFamily: "Inter",
+                                        fontSize: "16px",
+                                        fontWeight: 700,
+                                        lineHeight: "35px",
+                                    }}
+                                >
+                                    {!loading && (currentStep == TOTAL_STEPS ? "Submit" : "Next")}
+                                    {loading && <span className="w-2 h-2 animate-spin" />}
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     );
 };
 

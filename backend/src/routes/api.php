@@ -11,6 +11,9 @@ use App\Http\Controllers\AnamnesisSectionController;
 use App\Http\Controllers\SpecializationController;
 use App\Http\Controllers\SpecializedDemographicController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\AvailabilityController;
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\StripeController;
 
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
@@ -46,16 +49,24 @@ Route::post('/anamnesis/answers', [AnamnesisController::class, 'answer']);
 Route::get('/therapists', [TherapistController::class, 'index']);
 Route::post('/therapists', [TherapistController::class, 'store']);
 Route::get('/therapists/{id}', [TherapistController::class, 'show']);
-Route::post('therapists/{id}', [TherapistController::class, 'update']); // Atualizar um terapeuta
-Route::delete('therapists/{id}', [TherapistController::class, 'destroy']); // Deletar um terapeuta
+Route::post('/therapists/{id}', [TherapistController::class, 'update']); // Atualizar um terapeuta
+Route::delete('/therapists/{id}', [TherapistController::class, 'destroy']); // Deletar um terapeuta
+Route::get('/therapists/{id}/availabilities', [AvailabilityController::class, 'index']);
 
 Route::post('/recommendations', [TherapistRecommendationController::class, 'recommend']);
 
 // Rotas para Specializations
-Route::apiResource('specializations', SpecializationController::class);
+Route::apiResource('/specializations', SpecializationController::class);
 
 // Rotas para Specialized Demographics
-Route::apiResource('specialized-demographics', SpecializedDemographicController::class);
+Route::apiResource('/specialized-demographics', SpecializedDemographicController::class);
 
 // Rotas para Languages
 Route::get('/languages', [LanguageController::class, "index"]);
+
+Route::post('/availabilities', [AvailabilityController::class, 'store']);
+Route::post('/appointments', [AppointmentController::class, 'store']);
+
+Route::post('/stripe/webhook', [StripeController::class, 'handle']);
+Route::get('/stripe/onboarding/success', [StripeController::class, 'onboardingSuccess'])->name('stripe.onboarding.success');
+Route::get('/stripe/onboarding/refresh', [StripeController::class, 'onboardingRefresh'])->name('stripe.onboarding.refresh');

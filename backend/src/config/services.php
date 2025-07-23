@@ -34,5 +34,9 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
+    'stripe' => [
+        'secret' => env('STRIPE_SECRET'),
+        'commission' => env('STRIPE_COMMISSION', 0.15),
+        'currency' => env('STRIPE_CURRENCY', 'usd'),
+    ],
 ];

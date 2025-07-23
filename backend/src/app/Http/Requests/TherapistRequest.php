@@ -48,6 +48,7 @@ class TherapistRequest extends FormRequest
             'language_other' => 'nullable|string',
             'anamnesis_category_ids' => 'nullable|array',
             'anamnesis_category_ids.*' => 'integer|exists:anamnesis_categories,id',
+            'price_per_session' => 'nullable|numeric|min:0',
         ];
 
         // Validação condicional apenas se houver envio de arquivos

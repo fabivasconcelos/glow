@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('appointments', function (Blueprint $table) {
+        Schema::create('therapist_availabilities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Cliente
             $table->foreignId('therapist_id')->constrained('therapists')->onDelete('cascade');
-            $table->dateTime('scheduled_at');
-            $table->enum('status', ['pending', 'confirmed', 'canceled', 'completed'])->default('pending');
+            $table->unsignedTinyInteger('weekday'); // 0 (Domingo) a 6 (Sábado)
+            $table->time('start_time');
+            $table->time('end_time');
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('appointments');
+        Schema::dropIfExists('therapist_availabilities');
     }
 };

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 const AnamnesisForm = () => {
     const navigate = useNavigate();
+    const isMobile = useIsMobile();
     const [searchParams] = useSearchParams();
     const categoryId = searchParams.get("category");
     const [questions, setQuestions] = useState([]);
@@ -75,12 +77,15 @@ const AnamnesisForm = () => {
     const section = question.section;
     const backgroundImage = section?.image ? `url(${section.image})` : "";
 
+    const increment = isMobile ? 3.5 : 2;
+    const progressPercent = (((currentQuestion + increment) / allCount) * 100);
+
     return (
         <div
             className="min-h-screen bg-cover bg-center px-4 pt-6 pb-12"
             style={{ backgroundImage }}>
             {/* Barra translúcida com fundo */}
-            <div className="flex flex-col gap-6 max-w-4xl mx-auto mt-16">
+            <div className="flex flex-col gap-6 max-w-4xl mx-auto lg:mt-8 mt-4">
                 <svg xmlns="http://www.w3.org/2000/svg" width="97" height="34" viewBox="0 0 97 34" fill="none">
                     <path d="M12.335 26.6895C10.5443 26.6895 8.88862 26.3696 7.36891 25.7307C5.8492 25.0917 4.54731 24.2079 3.46325 23.0809C2.37919 21.9538 1.53069 20.6052 0.91858 19.0358C0.305631 17.4655 0 15.7395 0 13.8569C0 11.9743 0.305631 10.2475 0.91858 8.67811C1.53069 7.10872 2.37919 5.76091 3.46325 4.63301C4.54647 3.50595 5.8492 2.62213 7.36891 1.98321C8.88862 1.34429 10.5434 1.02441 12.335 1.02441C13.7247 1.02441 15.0088 1.21101 16.1874 1.58253C17.3652 1.95489 18.4079 2.44303 19.3155 3.04696C20.2223 3.65173 20.988 4.3373 21.6128 5.1045C22.2367 5.8717 22.691 6.66223 22.9738 7.47608C23.1621 7.96422 23.2212 8.41738 23.1503 8.83638C23.0793 9.25539 22.9257 9.61525 22.691 9.91763C22.4554 10.22 22.1607 10.4583 21.8078 10.6324C21.4541 10.8065 21.0775 10.8939 20.6765 10.8939C20.1345 10.8939 19.6043 10.7082 19.0859 10.3358C18.5675 9.96428 18.1546 9.37118 17.849 8.55732C17.1651 6.67389 16.1756 5.18697 14.8805 4.09406C13.5845 3.00115 12.1703 2.45469 10.6397 2.45469C9.69659 2.45469 8.87257 2.71043 8.16591 3.22189C7.45924 3.73336 6.87584 4.39644 6.41655 5.20946C5.95726 6.02331 5.61533 6.94129 5.39159 7.96422C5.16701 8.98716 5.05557 10.0218 5.05557 11.068C5.05557 12.37 5.29112 13.7178 5.76223 15.1131C6.23334 16.5076 6.90455 17.7871 7.77669 18.9491C8.64799 20.112 9.70251 21.065 10.9402 21.8089C12.1771 22.5536 13.5735 22.9251 15.1287 22.9251C16.3301 22.9251 17.2259 22.5477 17.8152 21.7914C18.4037 21.0366 18.6983 20.077 18.6983 18.9141V18.2169C18.6983 18.0078 18.6865 17.7987 18.6629 17.5888L18.6983 18.356C18.6511 17.4031 18.4687 16.5834 18.1504 15.8978C17.8321 15.2122 17.296 14.869 16.542 14.869C16.0473 14.869 15.5703 14.974 15.111 15.1831C14.6517 15.3922 14.2101 15.6312 13.7855 15.8978C13.3616 16.1652 12.9488 16.4034 12.5486 16.6125C12.1475 16.8216 11.7355 16.9266 11.3117 16.9266C10.6515 16.9266 10.0799 16.735 9.59781 16.351C9.11488 15.9678 8.86075 15.4388 8.83796 14.7641C8.81432 14.1602 9.0676 13.5962 9.59781 13.0731C10.128 12.5499 10.8288 12.2884 11.7009 12.2884C12.2894 12.2884 12.7436 12.3409 13.0619 12.445C13.3802 12.5491 13.739 12.6666 14.1401 12.794C14.5402 12.9223 15.0705 13.0381 15.7307 13.143C16.3901 13.248 17.3441 13.2997 18.5937 13.2997H22.0569C23.0228 13.2997 23.6475 13.4912 23.9304 13.8753C24.2132 14.2593 24.3542 14.8466 24.3542 15.6362V25.644C24.3542 26.3413 24.2005 26.6903 23.8949 26.6903C23.7767 26.6903 23.6475 26.597 23.5065 26.4112C23.3411 26.1788 23.1528 25.9231 22.9409 25.644C22.729 25.365 22.4934 25.1034 22.2342 24.8593C21.975 24.6153 21.6863 24.412 21.368 24.2496C21.0497 24.0871 20.69 24.0055 20.2898 24.0055C19.8896 24.0055 19.4472 24.1454 18.9643 24.4237C18.4814 24.7027 17.9216 25.0109 17.2859 25.3475C16.6493 25.6848 15.9308 25.9922 15.1296 26.2713C14.3283 26.5503 13.3979 26.6895 12.3375 26.6895H12.335Z" fill="#FF9900" />
                     <path d="M26.2936 25.33C26.6237 24.7952 26.8821 24.1963 27.0712 23.534C27.2595 22.8718 27.4005 22.2262 27.495 21.599C27.5887 20.9709 27.6478 20.3903 27.6715 19.8555C27.6943 19.3207 27.7069 18.9375 27.7069 18.7051V8.8714C27.7069 8.61566 27.6951 8.22665 27.6715 7.70352C27.6478 7.18039 27.5887 6.60478 27.495 5.97752C27.4005 5.34943 27.2595 4.69885 27.0712 4.02494C26.8821 3.35104 26.6237 2.75794 26.2936 2.24647C26.1526 2.03738 26.0513 1.88661 25.9931 1.79331C25.934 1.70085 26.0336 1.63087 26.2936 1.58423L32.7262 0.0140012C32.9145 -0.0326473 33.009 0.0373255 33.009 0.223087V18.7051C33.009 19.2399 33.0268 19.7688 33.0622 20.292C33.0977 20.8151 33.1619 21.3324 33.2564 21.8439C33.5393 23.1925 34.0982 24.4362 34.9349 25.5749C35.7707 26.7136 36.7551 27.7024 37.8865 28.5388C39.0178 29.3759 40.2133 30.0265 41.4738 30.4913C42.7344 30.9562 43.9299 31.1886 45.0612 31.1886C46.3099 31.1886 47.323 30.9903 48.1006 30.5955C48.8782 30.1998 49.5671 29.7641 50.1683 29.2876C50.7694 28.8112 51.3342 28.3747 51.8644 27.9798C52.3946 27.5841 53.0245 27.3867 53.7556 27.3867C54.4868 27.3867 55.0575 27.5958 55.5404 28.0148C56.0234 28.433 56.2412 29.0028 56.1948 29.7233C56.1711 30.3514 55.9415 30.9028 55.5058 31.3793C55.0693 31.8558 54.5037 32.2565 53.8097 32.5822C53.114 32.9071 52.3127 33.152 51.406 33.3144C50.4984 33.4768 49.5502 33.5585 48.5607 33.5585C46.6755 33.5585 45.0316 33.3719 43.6301 33.0004C42.2278 32.628 40.9968 32.1632 39.9364 31.6059C38.876 31.0478 37.9338 30.438 37.1089 29.775C36.284 29.1127 35.5005 28.5021 34.7584 27.944C34.0163 27.3859 33.2742 26.9211 32.532 26.5495C31.7899 26.1772 30.9473 25.9914 30.0051 25.9914H26.2936C26.0344 25.9914 25.934 25.9339 25.9931 25.8173C26.0513 25.7015 26.1518 25.5383 26.2936 25.3292V25.33Z" fill="#FF9900" />
@@ -96,7 +101,7 @@ const AnamnesisForm = () => {
                     }}>
                         <div className="absolute top-[-8px] left-0 h-[30px] rounded-full bg-white flex items-center justify-center"
                             style={{
-                                width: `${(((currentQuestion + 2) / allCount) * 100) - 5}%`
+                                width: `${progressPercent >= 100 ? 100 : progressPercent - 5}%`
                             }}>
                             <span className="text-[#453B2C80] font-inter font-bold text-sm pr-3 w-full text-right">
                                 {currentQuestion + 1} / {allCount}
@@ -108,22 +113,22 @@ const AnamnesisForm = () => {
                 {/* Container com fundo embaçado (duas camadas atrás do conteúdo) */}
                 <div className="relative w-full max-w-4xl mt-4 rounded-[18px]">
                     {/* Camada de blur 1 */}
-                    <div className="absolute inset-0 rounded-[18px] z-0" style={{ filter: "blur(5px)", background: "rgba(248, 245, 245, 0.30)" }} />
+                    <div className="absolute inset-0 rounded-[18px] z-0" style={{ filter: "blur(2.5px)", background: "rgba(235, 151, 12, 0.10)" }} />
                     {/* Camada de blur 2 */}
-                    <div className="absolute inset-0 rounded-[18px] backdrop-blur-[15px] z-0" style={{ background: "rgba(248, 245, 245, 0.30)" }} />
+                    <div className="absolute inset-0 rounded-[18px] backdrop-blur-[15px] z-0" style={{ background: "rgba(255, 255, 255, 0.30)" }} />
 
                     {/* Conteúdo principal */}
                     <div className="relative z-10 px-6 py-10">
-                        <h1 className="w-full px-20 text-center text-[32px] text-[#453B2C] font-[400] mb-10 leading-tight font-gloock flex items-center justify-center gap-2 flex-wrap">
+                        <h1 className="w-full lg:px-20 px-4 text-center text-[32px] text-[#453B2C] font-[400] mb-10 leading-tight font-gloock flex items-center justify-center gap-2 flex-wrap">
                             {question.question}
                             {question.type === "multiple_choice" && (
                                 <span className="text-[18px] font-inter font-[400] text-[#453B2C]">(Select all that apply)</span>
                             )}
                         </h1>
-                        <form className="mb-20 px-20">
+                        <form className="lg:mb-20 lg:px-20 p-4">
                             {question.type === "single_choice" && (
                                 <div
-                                    className={`gap-y-3 ${question.options.length > 10 ? "grid grid-cols-2 gap-x-12" : "flex flex-col"
+                                    className={`lg:gap-y-3 gap-y-6 ${question.options.length > 10 && !isMobile ? "grid grid-cols-2 gap-x-12" : "flex flex-col"
                                         }`}
                                 >
                                     {question.options.map(option => (
@@ -157,7 +162,7 @@ const AnamnesisForm = () => {
 
                             {question.type === "multiple_choice" && (
                                 <div
-                                    className={`gap-y-3 ${question.options.length > 10 ? "grid grid-cols-2 gap-x-12" : "flex flex-col"
+                                    className={`lg:gap-y-3 gap-y-6 ${question.options.length > 10 && !isMobile ? "grid grid-cols-2 gap-x-12" : "flex flex-col"
                                         }`}
                                 >
                                     {question.options.map(option => (
@@ -202,10 +207,10 @@ const AnamnesisForm = () => {
                             )}
 
                             {question.type === "text" && (
-                                <div className="relative mt-6 w-full">
+                                <div className="relative lg:mt-6 w-full">
                                     <textarea
                                         className="w-full px-6 py-4 border border-gray-300 rounded-[18px] bg-white/80 shadow-md text-lg 
-                   focus:outline-none focus:ring-2 focus:ring-gray-500 h-[50vh] block resize-none 
+                   focus:outline-none focus:ring-2 focus:ring-gray-500 lg:h-[50vh] h-[30vh] block resize-none 
                    placeholder:text-[#646464] placeholder:italic placeholder:font-medium font-inter"
                                         placeholder="Answer here."
                                         onChange={(e) => handleChange(question.id, e.target.value)}

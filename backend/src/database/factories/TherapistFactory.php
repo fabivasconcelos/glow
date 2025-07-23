@@ -48,8 +48,9 @@ class TherapistFactory extends Factory
                 'Standard ($200-$299)',
                 'Introductory (under $200)',
             ]),
+            'price_per_session' => $this->faker->randomElement([0, 1000]),
             'additional_information' => $this->faker->paragraph(2),
-            'status' => 'active',
+            'status' => $this->faker->randomElement(['active', 'inactive']),
             'plan' => $this->faker->randomElement(['standard', 'plus']),
         ];
     }

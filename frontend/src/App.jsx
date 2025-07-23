@@ -13,7 +13,7 @@ import TherapistFormConfirmation from "./pages/TherapistFormConfirmation";
 
 function App() {
     return (
-        <Router basename="/app">
+        <Router basename="/">
             <Routes>
                 <Route path="/" element={<GetStarted />} />
                 <Route path="/welcome" element={<WelcomeScreen />} />

@@ -13,12 +13,12 @@ const WelcomeScreen = () => {
       <div
         className="mx-auto w-full max-w-lg rounded-[18px] shadow-2xl px-8 py-10 text-center z-10 backdrop-blur-[15px]"
         style={{
-          background: "rgba(248, 245, 245, 0.70)",
+          background: "rgba(245, 245, 245, 0.70)",
         }}
       >
         <h1 className="text-[32px] font-[400] font-gloock text-[#202020] mb-6">Welcome to Glow</h1>
 
-        <p className="text-[#453B2C] font-gloock text-[20px] leading-relaxed mb-4 px-16">
+        <p className="text-[#453B2C] font-gloock text-[20px] leading-relaxed mb-4 lg:px-16 px-4">
           You're about to begin a brief<br/>3 to 4 minute assessment to match you with your perfect specialist.<br /><br />
           Your thoughtful responses and privacy are valued throughout this process.
         </p>

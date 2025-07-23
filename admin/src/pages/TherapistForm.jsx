@@ -5,6 +5,7 @@ import { useParams, useNavigate } from "react-router-dom";
 const TherapistForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     full_name: "",
     gender: "male",
@@ -32,6 +33,7 @@ const TherapistForm = () => {
     session_length_minutes: "",
     recommended_frequency: "",
     pricing_tier: "Introductory (under $200)",
+    price_per_session: 0,
     additional_information: "",
     specialization_ids: [],
     specialized_demographic_ids: [],
@@ -40,7 +42,7 @@ const TherapistForm = () => {
     specialized_demographic_other: "",
     language_other: "",
     profile_picture: null,
-    intro_video: null,
+    intro_video: null
   });
 
   const [specializations, setSpecializations] = useState([]);
@@ -132,6 +134,7 @@ const TherapistForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const form = new FormData();
 
     for (const key in formData) {
@@ -168,12 +171,14 @@ const TherapistForm = () => {
           }
         );
       }
+      setIsLoading(false);
       setSuccessMessage("Therapist saved successfully! ✅");
       setTimeout(() => {
         setSuccessMessage("");
         navigate("/therapists");
       }, 3000);
     } catch (error) {
+      setIsLoading(false);
       console.error("Erro ao salvar terapeuta:", error);
     }
   };
@@ -643,6 +648,20 @@ const TherapistForm = () => {
                 </option>
               </select>
             </div>
+            <div>
+              <label className="block mb-1 text-gray-700 font-semibold">
+                Price per Session (USD) [It'll be used to charge the clients]
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                name="price_per_session"
+                value={formData.price_per_session}
+                onChange={handleChange}
+                placeholder="Ex: 120.00"
+                className="w-full p-3 border rounded-lg"
+              />
+            </div>
 
             <h2 className="text-2xl font-semibold mb-6 text-left">
               Languages (select all that apply)
@@ -714,9 +733,11 @@ const TherapistForm = () => {
             {/* Submit */}
             <button
               type="submit"
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700"
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 flex items-center justify-center"
             >
-              Save Therapist
+              <span className="min-w-[200px] h-auto">
+                {isLoading ? <span className="spinner" /> : "Save Therapist"}
+              </span>
             </button>
             {successMessage && (
               <div className="text-green-600 font-semibold text-center mt-2">

@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\TherapistRequest;
 use App\Models\Therapist;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
+use App\Services\StripeService;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TherapistStripeOnboarding;
 
 class TherapistController extends Controller
 {
@@ -187,6 +188,27 @@ class TherapistController extends Controller
 
         if (isset($data['anamnesis_category_ids'])) {
             $therapist->anamnesisCategories()->sync($data['anamnesis_category_ids']);
+        }
+
+        // Verifica se ativou e ainda não tem conta Cal.com
+        if (
+            $therapist->status === 'active' &&
+            empty($therapist->stripe_account_id)
+        ) {
+            $stripeService = new StripeService();
+
+            $stripeAccount = $stripeService->createConnectedAccount($therapist->contact_email);
+            // Link de onboarding
+            $onboardingLink = $stripeService->createAccountLink($stripeAccount['id']);
+
+            // 3. Atualiza dados do terapeuta
+            $therapist->stripe_account_id = $stripeAccount['id'];
+            $therapist->stripe_onboarding_link = $onboardingLink;
+            $therapist->stripe_ready = false;
+            $therapist->save();
+
+            // 4. Envia e-mail para o terapeuta
+            Mail::to($therapist->contact_email)->send(new TherapistStripeOnboarding($therapist));
         }
 
         return response()->json(['message' => 'Therapist updated successfully']);

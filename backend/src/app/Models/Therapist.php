@@ -37,9 +37,13 @@ class Therapist extends Model
         'session_length_minutes',
         'recommended_frequency',
         'pricing_tier',
+        'price_per_session',
         'additional_information',
         'status',
-        'plan'
+        'plan',
+        'stripe_account_id',
+        'stripe_onboarding_link',
+        'stripe_ready'
     ];
 
     public function specializations()

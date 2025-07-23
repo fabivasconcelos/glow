@@ -67,9 +67,10 @@ const TherapistView = () => {
             <Info label="Session Length" value={`${therapist.session_length_minutes} min`} />
             <Info label="Recommended Frequency" value={therapist.recommended_frequency} />
             <Info label="Pricing Tier" value={therapist.pricing_tier} />
+            <Info label="Pricing Per Sesion" value={therapist.price_per_session} />
             <Info label="Remote Sessions" value={therapist.remote_sessions ? "Yes" : "No"} />
             <Info label="In-Person Sessions" value={therapist.in_person_sessions ? "Yes" : "No"} />
-            {therapist.in_person_sessions && (
+            {therapist.in_person_sessions == 1 && (
               <Info label="Location" value={therapist.geographic_location} />
             )}
             <Info label="Status" value={therapist.status} />

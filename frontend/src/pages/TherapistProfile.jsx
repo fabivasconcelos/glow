@@ -35,10 +35,10 @@ const TherapistProfile = () => {
                         <img
                             src={therapist.profile_picture}
                             alt={therapist.full_name}
-                            className="absolute bottom-[-50px] right-12 w-24 h-24 rounded-full border-4 border-white shadow-md"
+                            className="absolute bottom-[-50px] left-4 lg:right-12 lg:w-24 lg:h-24 w-20 h-20 rounded-full border-4 border-white shadow-md"
                         />
                         {therapist.plan === 'plus' && (
-                            <span className="absolute bottom-[-50px] right-12 w-6 h-6 rounded-full flex items-center justify-center">
+                            <span className="absolute bottom-[-50px] lg:right-12 right-[75%] w-6 h-6 rounded-full flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 34 34" fill="none">
                                     <circle cx="16.8229" cy="17.2829" r="16.362" fill="#FFA805" />
                                     <path d="M16.8299 6.375L18.3452 8.68917L20.5606 7.03283L21.1931 9.72571L23.8414 8.92699L23.5147 11.6738L26.2765 11.829L25.03 14.2984L27.5721 15.3888L25.5563 17.283L27.5721 19.1771L25.03 20.2676L26.2765 22.737L23.5147 22.8922L23.8414 25.639L21.1931 24.8403L20.5606 27.5332L18.3452 25.8768L16.8299 28.191L15.3145 25.8768L13.0991 27.5332L12.4667 24.8403L9.81835 25.639L10.1451 22.8922L7.38327 22.737L8.62974 20.2676L6.08759 19.1771L8.10347 17.283L6.08759 15.3888L8.62974 14.2984L7.38327 11.829L10.1451 11.6738L9.81835 8.92699L12.4667 9.72571L13.0991 7.03283L15.3145 8.68917L16.8299 6.375Z" fill="white" />
@@ -49,8 +49,8 @@ const TherapistProfile = () => {
                         )}
                     </div>
 
-                    <div className="pt-24 pb-10">
-                        <div className="pl-12 pr-56">
+                    <div className="lg:pt-24 lg:pb-10 p-6 lg:mt-0 mt-12">
+                        <div className="lg:pl-12 lg:pr-56">
                             <h1 className="text-[36px] font-gloock text-[#453B2C] leading-none">{therapist.full_name}</h1>
                             <p className="text-[18px] font-[400] text-[#453B2C] font-inter my-2">{therapist.professional_title}</p>
 
@@ -61,7 +61,7 @@ const TherapistProfile = () => {
                             {/* Seções colapsáveis (simplificado como sempre abertas aqui) */}
                             <div className="border-t border-[#453B2C] py-4">
                                 <p className="font-[500] font-inter text-[24px] text-[#453B2C]">Specialization</p>
-                                <ul className="list-disc list-inside font-[400] font-inter text-[20px] mt-2 ml-4">
+                                <ul className="list-disc list-inside font-[400] font-inter text-[20px] mt-2 lg:ml-4">
                                     {therapist.specializations.map((item, i) => (
                                         <li key={i}>{item.name}</li>
                                     ))}
@@ -70,12 +70,12 @@ const TherapistProfile = () => {
 
                             <div className="border-t border-[#453B2C] py-4">
                                 <p className="font-[500] font-inter text-[24px] text-[#453B2C]">Academic background</p>
-                                <p className="font-[400] font-inter text-[20px] mt-2 ml-4">{therapist.education_background}</p>
+                                <p className="font-[400] font-inter text-[20px] mt-2 lg:ml-4">{therapist.education_background}</p>
                             </div>
 
                             <div className="border-t border-[#453B2C] py-4">
                                 <p className="font-[500] font-inter text-[24px] text-[#453B2C]">Price per session</p>
-                                <p className="font-[400] font-inter text-[20px] mt-2 ml-4">${therapist.pricing_tier}</p>
+                                <p className="font-[400] font-inter text-[20px] mt-2 lg:ml-4">${therapist.pricing_tier}</p>
                             </div>
                         </div>
                         <div className="flex w-full items-center justify-center">
@@ -86,7 +86,7 @@ const TherapistProfile = () => {
                                 Schedule a call
                             </button>
                         </div>
-                        <div className="pl-12 pr-56 mt-12">
+                        <div className="lg:pl-12 lg:pr-56 mt-12">
                             <div className="border-t border-[#453B2C] py-4">
                                 <p className="font-[500] font-inter text-[24px] text-[#453B2C]">Reviews</p>
                                 {[...Array(1)].map((_, i) => (

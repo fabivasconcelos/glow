@@ -13,8 +13,12 @@ body {
   overflow-x: hidden;
 }
 
+input, select {
+  background-color: #FFF !important;
+}
+
 .get-started-bg {
-  background-image: url('/app/get-started.png');
+  background-image: url('/app/get-started.jpeg');
   background-size: cover;
   background-position: center;
 }
@@ -23,14 +27,6 @@ body {
   background-image: url('/app/recommendations-bg.png');
   background-size: cover;
   background-position: center;
-}
-
-@media (min-width: 1024px) {
-
-  /* Desktop */
-  .get-started-bg {
-    background-image: url('/app/get-started.jpeg');
-  }
 }
 
 /* index.css ou no componente */
