@@ -14,7 +14,7 @@ $today = \Carbon\Carbon::now()->format('M d, Y');
 
 <head>
     <meta charset="UTF-8" />
-    <title>Your Account is Now Active</title>
+    <title>Your Account is Under Review</title>
     <style>
         .gloock {
             font-family: 'Gloock', serif !important;
@@ -125,20 +125,15 @@ $today = \Carbon\Carbon::now()->format('M d, Y');
                                     <div class="email-container">
 
                                         <h1 class="email-title gloock">
-                                            Your Account is Now Active
+                                            Your Account is Under Review
                                         </h1>
 
                                         <p class="email-text">
-                                            Great news — your Glow account has been verified and activated!<br />
-                                            You can now log in and finish setting up your account to start connecting with clients.<br />
-                                            We’re excited to have you on board.<br />
+                                            Thank you for joining Glow!
+                                            Your profile has been received and is currently under review by our team. One of our administrators will verify your information shortly.<br />
+                                            You’ll receive a confirmation as soon as your account is approved and ready to go live.<br />
                                         </p>
 
-                                        <div class="email-button-container">
-                                            <a href="{{ $therapist->stripe_onboarding_link }}" class="email-button inter-medium">
-                                                Finish Setting Up
-                                            </a>
-                                        </div>
                                     </div>
                                 </div>
                                 <div style="height: 420px;"></div> <!-- reserva de altura do banner -->
@@ -148,7 +143,7 @@ $today = \Carbon\Carbon::now()->format('M d, Y');
 
                     <!-- Spacer abaixo do card -->
                     <tr>
-                        <td style="height: 100px; padding-top: 150px;">
+                        <td style="height: 100px; padding-top: 120px;">
                             <!-- Social Section -->
                             <table width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>

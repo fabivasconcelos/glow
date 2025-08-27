@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\TherapistRequest;
+use App\Mail\TherapistNewRegister;
 use App\Models\Therapist;
 use Illuminate\Support\Facades\File;
 use App\Services\StripeService;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TherapistStripeOnboarding;
+use App\Mail\TherapistUnderReview;
 
 class TherapistController extends Controller
 {
@@ -101,6 +103,10 @@ class TherapistController extends Controller
         if (isset($data['anamnesis_category_ids'])) {
             $therapist->anamnesisCategories()->sync($data['anamnesis_category_ids']);
         }
+
+        // 4. Envia e-mail para o terapeuta e admin
+        Mail::to(config("app.admin_email"))->send(new TherapistNewRegister($therapist));
+        Mail::to($therapist->contact_email)->send(new TherapistUnderReview($therapist));
 
         return response()->json($therapist->load(['anamnesisCategories', 'specializations', 'specializedDemographics', 'languages']), 201);
     }

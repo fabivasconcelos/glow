@@ -7,6 +7,7 @@ $iconXUrl = "https://app.glow.com.de/app/x.png";
 $iconLinkedinUrl = "https://app.glow.com.de/app/linkedin.png";
 $iconYoutubeUrl = "https://app.glow.com.de/app/youtube.png";
 $today = \Carbon\Carbon::now()->format('M d, Y');
+$dashBoardLink = config('app.admin') . "therapists/edit/$therapist->id"
 @endphp
 
 <!DOCTYPE html>
@@ -14,7 +15,7 @@ $today = \Carbon\Carbon::now()->format('M d, Y');
 
 <head>
     <meta charset="UTF-8" />
-    <title>Your Account is Now Active</title>
+    <title>New Therapist Awaiting Approval</title>
     <style>
         .gloock {
             font-family: 'Gloock', serif !important;
@@ -125,18 +126,17 @@ $today = \Carbon\Carbon::now()->format('M d, Y');
                                     <div class="email-container">
 
                                         <h1 class="email-title gloock">
-                                            Your Account is Now Active
+                                            New Therapist Awaiting Approval
                                         </h1>
 
                                         <p class="email-text">
-                                            Great news — your Glow account has been verified and activated!<br />
-                                            You can now log in and finish setting up your account to start connecting with clients.<br />
-                                            We’re excited to have you on board.<br />
+                                            A new therapist has just completed registration on Glow and is waiting for admin approval.<br />
+                                            Log in to the dashboard to review and approve the account.<br />
                                         </p>
 
                                         <div class="email-button-container">
-                                            <a href="{{ $therapist->stripe_onboarding_link }}" class="email-button inter-medium">
-                                                Finish Setting Up
+                                            <a href="{{ $dashBoardLink }}" class="email-button inter-medium">
+                                                Go to Dashboard
                                             </a>
                                         </div>
                                     </div>
@@ -148,7 +148,7 @@ $today = \Carbon\Carbon::now()->format('M d, Y');
 
                     <!-- Spacer abaixo do card -->
                     <tr>
-                        <td style="height: 100px; padding-top: 150px;">
+                        <td style="height: 100px; padding-top: 120px;">
                             <!-- Social Section -->
                             <table width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>

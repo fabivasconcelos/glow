@@ -15,14 +15,15 @@ use App\Http\Controllers\AvailabilityController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\StripeController;
 
-Route::post('/register', [UserController::class, 'register']);
-Route::post('/login', [UserController::class, 'login']);
+Route::post('/users/register', [UserController::class, 'register']);
+Route::post('/users/login', [UserController::class, 'login']);
 Route::post('/admin/login', [AdminController::class, 'login']);
 
 // Rotas protegidas por autenticação
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [UserController::class, 'profile']);
     Route::post('/profile', [UserController::class, 'update']);
+    Route::post('/appointments', [AppointmentController::class, 'store']);
 });
 
 Route::get('/anamnesis/categories', [AnamnesisCategoryController::class, 'index']);
@@ -51,7 +52,7 @@ Route::post('/therapists', [TherapistController::class, 'store']);
 Route::get('/therapists/{id}', [TherapistController::class, 'show']);
 Route::post('/therapists/{id}', [TherapistController::class, 'update']); // Atualizar um terapeuta
 Route::delete('/therapists/{id}', [TherapistController::class, 'destroy']); // Deletar um terapeuta
-Route::get('/therapists/{id}/availabilities', [AvailabilityController::class, 'index']);
+Route::get('/therapists/{id}/availability', [AvailabilityController::class, 'index']);
 
 Route::post('/recommendations', [TherapistRecommendationController::class, 'recommend']);
 
@@ -65,7 +66,6 @@ Route::apiResource('/specialized-demographics', SpecializedDemographicController
 Route::get('/languages', [LanguageController::class, "index"]);
 
 Route::post('/availabilities', [AvailabilityController::class, 'store']);
-Route::post('/appointments', [AppointmentController::class, 'store']);
 
 Route::post('/stripe/webhook', [StripeController::class, 'handle']);
 Route::get('/stripe/onboarding/success', [StripeController::class, 'onboardingSuccess'])->name('stripe.onboarding.success');

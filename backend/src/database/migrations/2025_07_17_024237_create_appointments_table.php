@@ -18,6 +18,7 @@ return new class extends Migration
             $table->dateTime('scheduled_at');
             $table->string('status')->default('pending'); // pending, paid, confirmed, canceled
             $table->string('payment_intent_id')->nullable();
+            $table->string('payment_url', 2048)->nullable();
             $table->timestamps();
         });
     }

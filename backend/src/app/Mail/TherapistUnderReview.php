@@ -7,7 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class TherapistStripeOnboarding extends Mailable
+class TherapistUnderReview extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -20,7 +20,7 @@ class TherapistStripeOnboarding extends Mailable
 
     public function build(): self
     {
-        return $this->subject('Your Account is Now Active')
-                    ->markdown('emails.therapists.stripe-onboarding');
+        return $this->subject('Your Account is Under Review')
+                    ->markdown('emails.therapists.under-review');
     }
 }

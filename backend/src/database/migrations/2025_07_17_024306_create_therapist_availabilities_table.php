@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('therapist_availabilities', function (Blueprint $table) {
+        Schema::create('availabilities', function (Blueprint $table) {
             $table->id();
             $table->foreignId('therapist_id')->constrained('therapists')->onDelete('cascade');
-            $table->unsignedTinyInteger('weekday'); // 0 (Domingo) a 6 (Sábado)
+            $table->unsignedTinyInteger('weekday');
             $table->time('start_time');
             $table->time('end_time');
             $table->timestamps();

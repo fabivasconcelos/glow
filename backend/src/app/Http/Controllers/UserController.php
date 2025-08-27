@@ -18,6 +18,7 @@ class UserController extends Controller
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
             'email' => 'required|email|unique:users',
+            'phone' => 'nullable|string|max:100',
             'password' => 'required|min:6',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -35,6 +36,7 @@ class UserController extends Controller
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'email' => $request->email,
+            'phone' => $request->phone,
             'password' => Hash::make($request->password),
             'profile_picture' => $profilePicturePath,
         ]);
@@ -47,16 +49,17 @@ class UserController extends Controller
      */
     public function login(Request $request)
     {
-        $request->validate([
+        $credentials = $request->validate([
             'email' => 'required|email',
-            'password' => 'required'
+            'password' => 'required',
         ]);
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (!Auth::guard('web')->attempt($credentials)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        $user = Auth::user();
+        $user = Auth::guard('web')->user();
+
         $token = $user->createToken('authToken')->plainTextToken;
 
         return response()->json(['user' => $user, 'token' => $token]);
@@ -73,6 +76,7 @@ class UserController extends Controller
             'first_name' => 'sometimes|string|max:100',
             'last_name' => 'sometimes|string|max:100',
             'email' => 'sometimes|email|unique:users,email,' . $user->id,
+            'phone' => 'sometimes|string|max:100',
             'password' => 'nullable|min:6',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -92,6 +96,7 @@ class UserController extends Controller
         // Atualizar campos apenas se forem enviados
         $user->first_name = $request->first_name ?? $user->first_name;
         $user->last_name = $request->last_name ?? $user->last_name;
+        $user->phone = $request->phone ?? $user->phone;
         $user->email = $request->email ?? $user->email;
 
         if ($request->filled('password')) {

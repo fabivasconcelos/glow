@@ -10,12 +10,10 @@ class Appointment extends Model
     protected $fillable = [
         'user_id',
         'therapist_id',
-        'start_time',
-        'end_time',
+        'scheduled_at',
         'status',
-        'payment_status',
-        'stripe_session_id',
-        'stripe_payment_intent_id',
+        'payment_intent_id',
+        'payment_url',
     ];
 
     public function therapist()

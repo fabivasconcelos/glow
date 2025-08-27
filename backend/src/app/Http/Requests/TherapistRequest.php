@@ -53,11 +53,11 @@ class TherapistRequest extends FormRequest
 
         // Validação condicional apenas se houver envio de arquivos
         if ($this->hasFile('profile_picture')) {
-            $rules['profile_picture'] = 'nullable|image';
+            $rules['profile_picture'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048';
         }
 
         if ($this->hasFile('intro_video')) {
-            $rules['intro_video'] = 'nullable|video';
+            $rules['intro_video'] = 'required|mimetypes:video/mp4,video/avi,video/mpeg,video/quicktime|max:20480';
         }
 
         return $rules;

@@ -52,7 +52,10 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'http://localhost:9001'),
+    'web' => env('WEB_APP_URL', 'http://localhost:5174/app'),
+    'admin' => env('WEB_ADMIN_URL', 'http://localhost:5173/admin'),
+    'admin_email' => env('ADMIN_EMAIL_RECEIVER', 'ofabivasconcelos@gmail.com'),
 
     /*
     |--------------------------------------------------------------------------

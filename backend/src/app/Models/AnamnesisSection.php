@@ -28,6 +28,6 @@ class AnamnesisSection extends Model
     // Criando um accessor para a URL correta da imagem do perfil
     public function getImageAttribute($value)
     {
-        return $value ?  env('APP_URL') . $value : null;
+        return $value ?  config('app.url') . $value : null;
     }
 }

@@ -9,7 +9,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            UserSeeder::class,
+            //UserSeeder::class,
             AdminSeeder::class,
             AnamnesisCategoriesSeeder::class,
             AnamnesisSectionSeeder::class,
@@ -17,7 +17,8 @@ class DatabaseSeeder extends Seeder
             SpecializationsSeeder::class,
             SpecializedDemographicsSeeder::class,
             LanguagesSeeder::class,
-            TherapistSeeder::class
+            TherapistSeeder::class,
+            AvailabilitySeeder::class
         ]);
     }
 }

@@ -68,11 +68,11 @@ class Therapist extends Model
 
     public function getProfilePictureAttribute($value)
     {
-        return $value ? env('APP_URL') . $value : null;
+        return $value ? config('app.url') . $value : null;
     }
 
     public function getIntroVideoAttribute($value)
     {
-        return $value ? env('APP_URL') . $value : null;
+        return $value ? config('app.url') . $value : null;
     }
 }

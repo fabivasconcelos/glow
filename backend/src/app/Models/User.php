@@ -16,12 +16,12 @@ class User extends Authenticatable
         'last_name',
         'email',
         'password',
+        'phone',
         'profile_picture'
     ];
 
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password'
     ];
 
     // Opcional: se houver campos com cast específicos futuramente
@@ -32,7 +32,7 @@ class User extends Authenticatable
      */
     public function getProfilePictureAttribute($value)
     {
-        return $value ? env('APP_URL') . $value : null;
+        return $value ? config('app.url') . $value : null;
     }
 
     // Acessor útil para exibir o nome completo diretamente
